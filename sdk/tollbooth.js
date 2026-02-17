@@ -80,10 +80,12 @@ async function verifyToken(token, apiKey) {
 
 /**
  * Build 402 Payment Required response for agents
+ * Includes onboarding info for non-x402 capable agents
  */
 function build402Response(req, options) {
   const { apiKey, amount, resource } = options;
   const requestedUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+  const isX402Capable = req.headers['x-402-capable'] === 'true';
   
   const paymentInfo = {
     status: 402,
@@ -112,6 +114,46 @@ function build402Response(req, options) {
       },
     },
   };
+
+  // Add onboarding info for non-x402 capable agents
+  if (!isX402Capable) {
+    paymentInfo.x402_onboarding = {
+      message: "Your agent doesn't appear to have x402 payment capability configured. Here's how to enable it:",
+      what_is_x402: "x402 is a protocol that allows AI agents to make micropayments to access premium content and APIs autonomously.",
+      setup_steps: [
+        "1. Add the 'pay_toll' tool to your agent's tool configuration",
+        "2. Configure a Solana wallet with USDC for payments",
+        "3. Set budget limits for autonomous spending",
+        "4. Add 'x-402-capable: true' header to advertise capability"
+      ],
+      tool_schema: {
+        name: "pay_toll",
+        description: "Pay a micropayment toll to access a paywalled resource. Use when you encounter HTTP 402 Payment Required responses.",
+        parameters: {
+          type: "object",
+          required: ["pay_url", "amount"],
+          properties: {
+            pay_url: { type: "string", description: "The payment URL from the 402 response" },
+            amount: { type: "number", description: "Payment amount in USDC" },
+            max_amount: { type: "number", description: "Maximum you're willing to pay (safety limit)" }
+          }
+        }
+      },
+      example_tool_call: {
+        tool: "pay_toll",
+        arguments: {
+          pay_url: paymentInfo.payment.pay_url,
+          amount: amount,
+          max_amount: 0.05
+        }
+      },
+      documentation: `${TOLL_API_BASE}/docs#agent-setup`,
+      sdk_install: "npm install @agenttoll/sdk",
+      sample_integration: `${TOLL_API_BASE}/docs#pay-toll-tool`,
+      operator_dashboard: `${TOLL_API_BASE}/dashboard`,
+      support: "support@agenttoll.io"
+    };
+  }
 
   return paymentInfo;
 }
@@ -190,6 +232,9 @@ function tollbooth(apiKey, options = {}) {
       walletAddress: config.walletAddress,
     });
 
+    // Check if agent advertises x402 capability
+    const isX402Capable = req.headers['x-402-capable'] === 'true';
+
     // Set x402 headers for agent parsing
     res.setHeader('X-402-Version', '1');
     res.setHeader('X-402-Amount', config.amount.toString());
@@ -197,6 +242,12 @@ function tollbooth(apiKey, options = {}) {
     res.setHeader('X-402-Pay-URL', paymentInfo.payment.pay_url);
     res.setHeader('X-402-Network', 'solana');
     res.setHeader('Content-Type', 'application/json');
+    
+    // Add onboarding hint for non-capable agents
+    if (!isX402Capable) {
+      res.setHeader('X-402-Onboarding', 'true');
+      res.setHeader('X-402-Setup-URL', `${TOLL_API_BASE}/docs#agent-setup`);
+    }
 
     return res.status(402).json(paymentInfo);
   };
