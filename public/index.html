@@ -21,7 +21,7 @@
         <a href="#agents">Agents</a>
         <a href="#pricing">Pricing</a>
         <a href="/docs">Docs</a>
-        <a href="#get-started" class="btn btn-primary">Get API Key</a>
+        <a href="#" onclick="openModal(); return false;" class="btn btn-primary">Get API Key</a>
       </div>
       <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
     </div>
@@ -98,9 +98,8 @@
 <span class="code-keyword">const</span> app = <span class="code-function">express</span>();
 
 <span class="code-comment">// Protect API routes with a toll for AI agents</span>
-app.<span class="code-function">use</span>(<span class="code-string">'/api/v1'</span>, <span class="code-function">tollbooth</span>({
-  <span class="code-property">apiKey</span>: process.env.<span class="code-variable">AGENTTOLL_KEY</span>,
-  <span class="code-property">price</span>: <span class="code-number">0.001</span>,          <span class="code-comment">// $0.001 USDC per request</span>
+app.<span class="code-function">use</span>(<span class="code-string">'/api/v1'</span>, <span class="code-function">tollbooth</span>(process.env.<span class="code-variable">AGENTTOLL_KEY</span>, {
+  <span class="code-property">amount</span>: <span class="code-number">0.001</span>,          <span class="code-comment">// $0.001 USDC per request</span>
   <span class="code-property">freeForHumans</span>: <span class="code-boolean">true</span>,   <span class="code-comment">// Browser traffic passes free</span>
 }));
 
@@ -221,11 +220,9 @@ User-Agent: Claude/3.5</code></pre>
           <h3>Flexible pricing</h3>
           <p>Set prices per route, per method, or globally. Change anytime.</p>
           <div class="feature-code">
-            <pre>tollbooth({
-  price: 0.001,
-  routes: {
-    '/expensive': { price: 0.01 }
-  }
+            <pre>tollbooth(process.env.AGENTTOLL_KEY, {
+  amount: 0.001,
+  paths: ['/api/*', '/premium/*']
 })</pre>
           </div>
         </div>
@@ -235,7 +232,7 @@ User-Agent: Claude/3.5</code></pre>
           <h3>Human traffic stays free</h3>
           <p>Browser requests pass through. Only AI agents pay the toll.</p>
           <div class="feature-code">
-            <pre>tollbooth({ freeForHumans: true })</pre>
+            <pre>tollbooth.agentsOnly(process.env.AGENTTOLL_KEY)</pre>
           </div>
         </div>
         
@@ -306,11 +303,7 @@ Authorization: Bearer {api_key}</pre>
           <div class="step-content">
             <h3>Get your API key</h3>
             <p>Sign up and create your first project to get credentials.</p>
-            <div class="step-code">
-              <pre>curl -X POST https://toll.agenttoll.io/api/publisher/register \
-  -H "Content-Type: application/json" \
-  -d '{"email": "you@example.com"}'</pre>
-            </div>
+            <button class="btn btn-primary" onclick="openModal()">Get API Key →</button>
           </div>
         </div>
         
@@ -331,11 +324,10 @@ Authorization: Bearer {api_key}</pre>
             <h3>Add the middleware</h3>
             <p>Wrap your routes with the tollbooth middleware.</p>
             <div class="step-code">
-              <pre>import { tollbooth } from '@agenttoll/sdk';
+              <pre>import tollbooth from '@agenttoll/sdk';
 
-app.use('/api', tollbooth({
-  apiKey: process.env.AGENTTOLL_KEY,
-  price: 0.001
+app.use('/api', tollbooth(process.env.AGENTTOLL_KEY, {
+  amount: 0.001
 }));</pre>
             </div>
           </div>
@@ -361,6 +353,95 @@ app.use('/api', tollbooth({
       <div class="footer-copy">© 2026 AgentToll</div>
     </div>
   </footer>
+
+  <!-- Registration Modal -->
+  <div id="register-modal" class="modal" style="display: none;">
+    <div class="modal-backdrop" onclick="closeModal()"></div>
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">×</button>
+      
+      <!-- Step 1: Registration Form -->
+      <div id="register-step-1">
+        <h2>Get your API Key</h2>
+        <p class="modal-subtitle">Start monetizing AI agent traffic in minutes.</p>
+        
+        <form id="register-form" onsubmit="submitRegistration(event)">
+          <div class="form-group">
+            <label for="reg-name">Project Name *</label>
+            <input type="text" id="reg-name" placeholder="My Weather API" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="reg-email">Email *</label>
+            <input type="email" id="reg-email" placeholder="you@example.com" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="reg-website">Website (optional)</label>
+            <input type="url" id="reg-website" placeholder="https://api.example.com">
+          </div>
+          
+          <div class="form-divider">
+            <span>Wallet Address (at least one required)</span>
+          </div>
+          
+          <div class="form-group">
+            <label for="reg-solana">Solana Wallet</label>
+            <input type="text" id="reg-solana" placeholder="Your Solana address for receiving payments">
+          </div>
+          
+          <div class="form-group">
+            <label for="reg-base">Base Wallet (optional)</label>
+            <input type="text" id="reg-base" placeholder="0x... Base/ETH address">
+          </div>
+          
+          <div id="register-error" class="form-error" style="display: none;"></div>
+          
+          <button type="submit" class="btn btn-primary btn-full" id="register-btn">
+            <span id="register-btn-text">Get API Key</span>
+          </button>
+        </form>
+      </div>
+      
+      <!-- Step 2: Success - Show Keys -->
+      <div id="register-step-2" style="display: none;">
+        <div class="success-icon">🎉</div>
+        <h2>You're all set!</h2>
+        <p class="modal-subtitle">Save these credentials — the secret key won't be shown again.</p>
+        
+        <div class="credentials-box">
+          <div class="credential">
+            <label>API Key (public)</label>
+            <div class="credential-value">
+              <code id="result-api-key"></code>
+              <button class="copy-btn" onclick="copyToClipboard('result-api-key')">📋</button>
+            </div>
+          </div>
+          
+          <div class="credential">
+            <label>Secret Key (keep private)</label>
+            <div class="credential-value">
+              <code id="result-secret-key"></code>
+              <button class="copy-btn" onclick="copyToClipboard('result-secret-key')">📋</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="next-steps">
+          <h3>Quick Start</h3>
+          <div class="step-code">
+            <pre id="result-integration"></pre>
+            <button class="copy-btn" onclick="copyToClipboard('result-integration')">📋</button>
+          </div>
+        </div>
+        
+        <div class="modal-actions">
+          <a href="/docs" class="btn btn-primary">Read the Docs</a>
+          <button class="btn btn-ghost" onclick="closeModal()">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="/js/main.js"></script>
 </body>

@@ -177,3 +177,117 @@ document.addEventListener('DOMContentLoaded', () => {
 console.log('%c⚡ AgentToll', 'font-size: 20px; font-weight: bold; color: #111827');
 console.log('%cAPI monetization for AI agents', 'font-size: 12px; color: #6b7280;');
 console.log('%cDocs: /docs | API Reference: /api/docs', 'font-size: 11px; color: #9ca3af;');
+
+// ==================== 
+// Registration Modal
+// ====================
+
+function openModal() {
+  const modal = document.getElementById('register-modal');
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  
+  // Reset to step 1
+  document.getElementById('register-step-1').style.display = 'block';
+  document.getElementById('register-step-2').style.display = 'none';
+  document.getElementById('register-form').reset();
+  document.getElementById('register-error').style.display = 'none';
+}
+
+function closeModal() {
+  const modal = document.getElementById('register-modal');
+  modal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+// Close modal on Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeModal();
+  }
+});
+
+async function submitRegistration(e) {
+  e.preventDefault();
+  
+  const btn = document.getElementById('register-btn');
+  const btnText = document.getElementById('register-btn-text');
+  const errorDiv = document.getElementById('register-error');
+  
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const website = document.getElementById('reg-website').value.trim();
+  const solanaWallet = document.getElementById('reg-solana').value.trim();
+  const baseWallet = document.getElementById('reg-base').value.trim();
+  
+  // Validate at least one wallet
+  if (!solanaWallet && !baseWallet) {
+    errorDiv.textContent = 'Please provide at least one wallet address (Solana or Base).';
+    errorDiv.style.display = 'block';
+    return;
+  }
+  
+  // Disable button
+  btn.disabled = true;
+  btnText.textContent = 'Creating...';
+  errorDiv.style.display = 'none';
+  
+  try {
+    const response = await fetch('/api/publisher/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        website: website || undefined,
+        wallet_address: solanaWallet || undefined,
+        wallets: {
+          solana: solanaWallet || undefined,
+          base: baseWallet || undefined,
+        },
+      }),
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.error || 'Registration failed');
+    }
+    
+    // Success! Show step 2
+    document.getElementById('register-step-1').style.display = 'none';
+    document.getElementById('register-step-2').style.display = 'block';
+    
+    // Populate credentials
+    document.getElementById('result-api-key').textContent = data.api_key;
+    document.getElementById('result-secret-key').textContent = data.secret_key;
+    document.getElementById('result-integration').textContent = 
+      `npm install @agenttoll/sdk\n\n// In your server.js\nimport tollbooth from '@agenttoll/sdk';\n\napp.use(tollbooth('${data.api_key}', {\n  amount: 0.005,       // USDC per request\n  freeForHumans: true  // Let browsers through free\n}));`;
+    
+  } catch (err) {
+    errorDiv.textContent = err.message;
+    errorDiv.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btnText.textContent = 'Get API Key';
+  }
+}
+
+function copyToClipboard(elementId) {
+  const element = document.getElementById(elementId);
+  const text = element.textContent;
+  
+  navigator.clipboard.writeText(text).then(() => {
+    // Show brief feedback
+    const btn = element.parentElement.querySelector('.copy-btn');
+    const originalText = btn.textContent;
+    btn.textContent = '✓';
+    setTimeout(() => {
+      btn.textContent = originalText;
+    }, 1500);
+  }).catch(err => {
+    console.error('Failed to copy:', err);
+  });
+}

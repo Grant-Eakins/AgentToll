@@ -1,0 +1,41 @@
+{
+  "name": "@agenttoll/sdk",
+  "version": "1.0.2",
+  "description": "One-line micropayment integration for AI agents - Express, Cloudflare Workers, Vercel Edge",
+  "main": "tollbooth.js",
+  "exports": {
+    ".": "./tollbooth.js",
+    "./edge": "./tollbooth-edge.js",
+    "./next": "./tollbooth-edge.js",
+    "./tool": "./agenttoll-tool.js"
+  },
+  "type": "module",
+  "keywords": [
+    "agenttoll",
+    "openclaw",
+    "ai-agents",
+    "micropayments",
+    "x402",
+    "solana",
+    "base",
+    "tollbooth",
+    "express-middleware",
+    "cloudflare-workers"
+  ],
+  "author": "AgentToll",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agenttoll/sdk"
+  },
+  "homepage": "https://agenttoll.io",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "tollbooth.js",
+    "tollbooth-edge.js",
+    "agenttoll-tool.js",
+    "agenttoll-tool-schema.json"
+  ]
+}

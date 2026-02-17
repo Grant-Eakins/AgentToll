@@ -285,8 +285,6 @@ tollbooth.hasPaid = function(req) {
  */
 tollbooth.isAgent = isAgent;
 
-// Export for different module systems
-module.exports = tollbooth;
-module.exports.default = tollbooth;
-module.exports.tollbooth = tollbooth;
-module.exports.isAgent = isAgent;
+// ES Module exports
+export default tollbooth;
+export { tollbooth, isAgent };
