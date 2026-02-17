@@ -7,7 +7,7 @@
  * export default tollgate('your-api-key')
  */
 
-const TOLL_API_BASE = 'https://toll.agenttoll.io';
+const TOLL_API_BASE = 'https://agenttoll-production.up.railway.app';
 
 const AGENT_PATTERNS = [
   /agenttoll/i, /openclaw/i, /clawd/i, /openai-agent/i,

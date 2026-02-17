@@ -20,7 +20,7 @@ import {
   TOKEN_PROGRAM_ID 
 } from '@solana/spl-token';
 
-const TOLL_API = 'https://toll.agenttoll.io';
+const TOLL_API = 'https://agenttoll-production.up.railway.app';
 const USDC_MINT = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'); // Mainnet USDC
 
 /**

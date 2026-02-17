@@ -10,7 +10,7 @@
  *   export default tollgate('your-api-key', { amount: 0.005 })
  */
 
-const TOLL_API_BASE = process.env.TOLL_API_URL || 'https://toll.agenttoll.io';
+const TOLL_API_BASE = process.env.TOLL_API_URL || 'https://agenttoll-production.up.railway.app';
 
 // Agent detection patterns
 const AGENT_PATTERNS = [

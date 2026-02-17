@@ -18,7 +18,7 @@ function getApiDocs() {
     name: 'AgentToll API',
     version: '1.0.0',
     description: 'Micropayment infrastructure for AI agents. Gate your API/content, agents pay in USDC.',
-    base_url: process.env.API_BASE_URL || 'https://toll.agenttoll.io',
+    base_url: process.env.API_BASE_URL || 'https://agenttoll-production.up.railway.app',
     
     authentication: {
       publisher: {
