@@ -1,0 +1,26 @@
+{
+  "name": "agenttoll",
+  "version": "1.0.0",
+  "description": "AI Agent Micropayment Tollbooth - One line integration for AgentToll/OpenClaw native payments",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test tests/"
+  },
+  "keywords": ["agenttoll", "openclaw", "ai-agents", "micropayments", "x402", "solana", "tollbooth"],
+  "dependencies": {
+    "@solana/web3.js": "^1.95.0",
+    "bs58": "^5.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.0",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "uuid": "^9.0.1"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "license": "MIT"
+}

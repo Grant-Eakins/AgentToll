@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentToll — API Monetization for AI Agents</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="/logo.png">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="logo">
+        <img src="/logo.png" alt="" class="logo-icon-img">
+        <img src="/Copilot_20260217_123447.png" alt="AgentToll" class="logo-text-img">
+      </a>
+      <div class="nav-links">
+        <a href="#how-it-works">How it Works</a>
+        <a href="#publishers">Publishers</a>
+        <a href="#agents">Agents</a>
+        <a href="#pricing">Pricing</a>
+        <a href="/docs">Docs</a>
+        <a href="#get-started" class="btn btn-primary">Get API Key</a>
+      </div>
+      <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <p class="hero-eyebrow">AI Agent Toll Infrastructure</p>
+      <h1>Monetize AI agent<br>traffic to your site</h1>
+      <p class="hero-subtitle">
+        Charge AI agents for accessing your APIs, content, or services. 
+        Drop-in middleware that detects agents and collects USDC payments on Solana or Base.
+      </p>
+      <div class="hero-buttons">
+        <a href="#get-started" class="btn btn-primary btn-large">Get Started</a>
+        <a href="/docs" class="btn btn-ghost btn-large">Documentation →</a>
+      </div>
+      
+      <!-- Live Stats -->
+      <div class="live-stats">
+        <div class="live-stats-header">
+          <span class="live-dot"></span>
+          <span>Live platform stats</span>
+        </div>
+        <div class="live-stats-grid">
+          <div class="live-stat">
+            <span class="live-stat-value" id="stat-publishers">0</span>
+            <span class="live-stat-label">APIs connected</span>
+          </div>
+          <div class="live-stat">
+            <span class="live-stat-value" id="stat-volume">$0</span>
+            <span class="live-stat-label">total volume</span>
+          </div>
+          <div class="live-stat">
+            <span class="live-stat-value" id="stat-publisher-earnings">$0</span>
+            <span class="live-stat-label">publisher earnings</span>
+          </div>
+          <div class="live-stat">
+            <span class="live-stat-value" id="stat-platform-revenue">$0</span>
+            <span class="live-stat-label">platform revenue</span>
+          </div>
+        </div>
+        <div class="supported-agents">
+          <span class="supported-label">Works with:</span>
+          <span class="agent-tag">Claude</span>
+          <span class="agent-tag">OpenAI / GPT-4</span>
+          <span class="agent-tag">Gemini</span>
+          <span class="agent-tag">OpenClaw</span>
+          <span class="agent-tag">LangChain</span>
+          <span class="agent-tag">CrewAI</span>
+          <span class="agent-tag">AutoGPT</span>
+          <span class="agent-tag">AgentGPT</span>
+          <span class="agent-tag">BabyAGI</span>
+          <span class="agent-tag">SuperAgent</span>
+          <span class="agent-tag">MCP agents</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-code">
+      <div class="code-window">
+        <div class="code-header">
+          <div class="code-dots">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+          <span class="code-filename">server.js</span>
+          <span class="code-lang">JavaScript</span>
+        </div>
+        <pre class="code-content"><code><span class="code-keyword">import</span> express <span class="code-keyword">from</span> <span class="code-string">'express'</span>;
+<span class="code-keyword">import</span> { tollbooth } <span class="code-keyword">from</span> <span class="code-string">'@agenttoll/sdk'</span>;
+
+<span class="code-keyword">const</span> app = <span class="code-function">express</span>();
+
+<span class="code-comment">// Protect API routes with a toll for AI agents</span>
+app.<span class="code-function">use</span>(<span class="code-string">'/api/v1'</span>, <span class="code-function">tollbooth</span>({
+  <span class="code-property">apiKey</span>: process.env.<span class="code-variable">AGENTTOLL_KEY</span>,
+  <span class="code-property">price</span>: <span class="code-number">0.001</span>,          <span class="code-comment">// $0.001 USDC per request</span>
+  <span class="code-property">freeForHumans</span>: <span class="code-boolean">true</span>,   <span class="code-comment">// Browser traffic passes free</span>
+}));
+
+<span class="code-comment">// Your existing routes work unchanged</span>
+app.<span class="code-function">get</span>(<span class="code-string">'/api/v1/weather'</span>, <span class="code-keyword">async</span> (req, res) <span class="code-keyword">=></span> {
+  <span class="code-keyword">const</span> data = <span class="code-keyword">await</span> <span class="code-function">fetchWeatherData</span>(req.query.<span class="code-variable">city</span>);
+  res.<span class="code-function">json</span>(data);
+});
+
+app.<span class="code-function">listen</span>(<span class="code-number">3000</span>);</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section id="how-it-works" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>How it works</h2>
+        <p>Four steps from request to payment. No changes to your business logic.</p>
+      </div>
+      
+      <div class="flow-grid">
+        <div class="flow-card">
+          <div class="flow-number">1</div>
+          <h3>Agent sends request</h3>
+          <p>AI agent calls your API. AgentToll middleware intercepts the request.</p>
+          <div class="flow-code">
+            <code>GET /api/v1/weather?city=tokyo</code>
+          </div>
+        </div>
+        
+        <div class="flow-card">
+          <div class="flow-number">2</div>
+          <h3>402 Payment Required</h3>
+          <p>Without a valid token, agent receives payment instructions.</p>
+          <div class="flow-code">
+            <code>{ "amount": 0.001, "currency": "USDC" }</code>
+          </div>
+        </div>
+        
+        <div class="flow-card">
+          <div class="flow-number">3</div>
+          <h3>Agent pays on Solana or Base</h3>
+          <p>Agent sends USDC to the wallet. Confirms in seconds.</p>
+          <div class="flow-code">
+            <code>tx: 5K7x...confirmed</code>
+          </div>
+        </div>
+        
+        <div class="flow-card">
+          <div class="flow-number">4</div>
+          <h3>Access granted</h3>
+          <p>Agent receives JWT token and retries. Your API returns data.</p>
+          <div class="flow-code">
+            <code>Authorization: Bearer eyJhbG...</code>
+          </div>
+        </div>
+      </div>
+
+      <!-- Demo -->
+      <div id="demo" class="demo-section">
+        <h3>Live request flow</h3>
+        <div class="demo-container">
+          <div class="demo-panel">
+            <div class="demo-header">
+              <span class="demo-label">Request</span>
+            </div>
+            <pre class="demo-code"><code>GET /api/v1/weather?city=tokyo HTTP/1.1
+Host: api.example.com
+User-Agent: Claude/3.5</code></pre>
+          </div>
+          <div class="demo-panel" id="demo-response">
+            <div class="demo-header">
+              <span class="demo-label">Response</span>
+              <span class="demo-status status-402">402</span>
+            </div>
+            <pre class="demo-code"><code>{
+  "error": "payment_required",
+  "payment": {
+    "amount": "0.001",
+    "currency": "USDC",
+    "network": "solana",
+    "recipient": "8xK7...9vN2"
+  }
+}</code></pre>
+          </div>
+        </div>
+        <div class="demo-button">
+          <button class="demo-btn" onclick="runDemo()">
+            <span id="demo-btn-text">▶ Simulate payment</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Publishers -->
+  <section id="publishers" class="section section-alt">
+    <div class="container">
+      <div class="section-header">
+        <h2>For API publishers</h2>
+        <p>Monetize your APIs with a few lines of code.</p>
+      </div>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📦</div>
+          <h3>Drop-in middleware</h3>
+          <p>Works with Express, Cloudflare Workers, and Next.js out of the box.</p>
+          <div class="feature-code">
+            <pre>npm install @agenttoll/sdk</pre>
+          </div>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3>Flexible pricing</h3>
+          <p>Set prices per route, per method, or globally. Change anytime.</p>
+          <div class="feature-code">
+            <pre>tollbooth({
+  price: 0.001,
+  routes: {
+    '/expensive': { price: 0.01 }
+  }
+})</pre>
+          </div>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">👤</div>
+          <h3>Human traffic stays free</h3>
+          <p>Browser requests pass through. Only AI agents pay the toll.</p>
+          <div class="feature-code">
+            <pre>tollbooth({ freeForHumans: true })</pre>
+          </div>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Real-time analytics</h3>
+          <p>Track revenue, requests, and agent usage from your dashboard.</p>
+          <div class="feature-code">
+            <pre>GET /api/analytics/summary
+Authorization: Bearer {api_key}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Agents -->
+  <section id="agents" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>For AI agents</h2>
+        <p>Standard MCP tool for discovering and paying tolls automatically.</p>
+      </div>
+      
+      <div class="agents-content">
+        <div class="schema-block">
+          <div class="schema-header">
+            <span class="schema-label">MCP Tool Schema</span>
+            <span class="schema-tag">agenttoll_pay</span>
+          </div>
+          <pre class="schema-code"><code>{
+  <span class="json-key">"name"</span>: <span class="json-string">"agenttoll_pay"</span>,
+  <span class="json-key">"description"</span>: <span class="json-string">"Pay a toll to access a paid API"</span>,
+  <span class="json-key">"parameters"</span>: {
+    <span class="json-key">"payment_request"</span>: {
+      <span class="json-key">"type"</span>: <span class="json-string">"object"</span>,
+      <span class="json-key">"description"</span>: <span class="json-string">"The payment object from 402 response"</span>
+    }
+  }
+}</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" class="section section-alt">
+    <div class="container" style="text-align: center;">
+      <div class="pricing-simple">
+        <div class="pricing-fee">5% fee</div>
+        <p class="pricing-desc">on all transactions processed through AgentToll</p>
+        <p class="pricing-note">* Contact <a href="mailto:sales@agenttoll.io">sales@agenttoll.io</a> for business inquiries</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Get Started -->
+  <section id="get-started" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Get started in 5 minutes</h2>
+        <p>Three steps to start accepting payments from AI agents.</p>
+      </div>
+      
+      <div class="steps-container">
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Get your API key</h3>
+            <p>Sign up and create your first project to get credentials.</p>
+            <div class="step-code">
+              <pre>curl -X POST https://toll.agenttoll.io/api/publisher/register \
+  -H "Content-Type: application/json" \
+  -d '{"email": "you@example.com"}'</pre>
+            </div>
+          </div>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>Install the SDK</h3>
+            <p>Add AgentToll to your project with npm or yarn.</p>
+            <div class="step-code">
+              <pre>npm install @agenttoll/sdk</pre>
+            </div>
+          </div>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>Add the middleware</h3>
+            <p>Wrap your routes with the tollbooth middleware.</p>
+            <div class="step-code">
+              <pre>import { tollbooth } from '@agenttoll/sdk';
+
+app.use('/api', tollbooth({
+  apiKey: process.env.AGENTTOLL_KEY,
+  price: 0.001
+}));</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <img src="/logo.png" alt="" class="logo-icon-img-small">
+        <img src="/Copilot_20260217_123447.png" alt="AgentToll" class="logo-text-img-small">
+      </div>
+      <div class="footer-links">
+        <a href="/docs">Documentation</a>
+        <a href="https://github.com/agenttoll">GitHub</a>
+        <a href="mailto:support@agenttoll.io">Support</a>
+        <a href="/docs#terms">Terms</a>
+        <a href="/docs#privacy">Privacy</a>
+      </div>
+      <div class="footer-copy">© 2026 AgentToll</div>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

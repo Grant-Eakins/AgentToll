@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Documentation - AgentToll</title>
+  <link rel="icon" href="/logo.png">
+  <style>
+    /* Self-contained CSS Variables */
+    :root {
+      --primary: #f85149;
+      --primary-light: #ff6b63;
+      --secondary: #f85149;
+      --accent: #f85149;
+      --bg-dark: #0f1419;
+      --bg-card: #1a1f26;
+      --bg-alt: #161b22;
+      --text-primary: #e6edf3;
+      --text-secondary: #8b949e;
+      --text-muted: #6e7681;
+      --border: #2f363e;
+      --success: #3fb950;
+      --warning: #d29922;
+      --error: #f85149;
+      --solana: #9945FF;
+      --base: #0052FF;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    a { color: var(--primary-light); text-decoration: none; }
+    a:hover { color: var(--primary); }
+    
+    code {
+      background: var(--bg-alt);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: var(--primary-light);
+      font-family: 'Consolas', 'SF Mono', 'Fira Code', monospace;
+    }
+
+    /* Navigation */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(15, 20, 25, 0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      z-index: 1000;
+      padding: 12px 24px;
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+
+    .logo-icon-img {
+      height: 40px;
+      width: 40px;
+      object-fit: contain;
+    }
+
+    .logo-text-img {
+      height: 44px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--text-primary);
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-light);
+    }
+
+    /* Layout */
+    .docs-layout {
+      display: flex;
+      min-height: 100vh;
+      padding-top: 70px;
+    }
+
+    /* Sidebar */
+    .docs-sidebar {
+      position: fixed;
+      top: 70px;
+      left: 0;
+      width: 240px;
+      height: calc(100vh - 70px);
+      background: var(--bg-alt);
+      border-right: 1px solid var(--border);
+      padding: 20px;
+      overflow-y: auto;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+
+    .docs-sidebar h4 {
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 20px 0 10px;
+    }
+
+    .docs-sidebar h4:first-child {
+      margin-top: 0;
+    }
+
+    .docs-sidebar a {
+      display: block;
+      color: var(--text-secondary);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      margin-bottom: 2px;
+    }
+
+    .docs-sidebar a:hover {
+      background: var(--bg-card);
+      color: var(--text-primary);
+    }
+
+    /* Main Content */
+    .docs-content {
+      flex: 1;
+      margin-left: 240px;
+      padding: 32px 40px;
+      max-width: 800px;
+      width: 100%;
+    }
+
+    .docs-content h1 {
+      font-size: 2.5rem;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+    }
+
+    .docs-content h2 {
+      font-size: 1.75rem;
+      margin: 48px 0 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      color: var(--text-primary);
+    }
+
+    .docs-content h2:first-of-type {
+      border-top: none;
+      margin-top: 32px;
+    }
+
+    .docs-content h3 {
+      font-size: 1.25rem;
+      margin: 32px 0 16px;
+      color: var(--primary-light);
+    }
+
+    .docs-content h4 {
+      font-size: 1rem;
+      margin: 24px 0 12px;
+      color: var(--text-primary);
+    }
+
+    .docs-content p {
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .docs-content ul, .docs-content ol {
+      color: var(--text-secondary);
+      padding-left: 24px;
+      margin-bottom: 16px;
+    }
+
+    .docs-content li {
+      margin-bottom: 8px;
+    }
+
+    /* Code Blocks */
+    .code-block {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+      overflow-x: auto;
+      max-width: 100%;
+    }
+
+    .code-block pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+
+    /* Endpoint Cards */
+    .endpoint-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin: 24px 0;
+      overflow: hidden;
+    }
+
+    .endpoint-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-alt);
+    }
+
+    .method {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+    }
+
+    .method-get { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+    .method-post { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+    .method-patch { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+    .method-delete { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+    .method-mode { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
+
+    .endpoint-path {
+      font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+      font-size: 1rem;
+      color: var(--text-primary);
+    }
+
+    .endpoint-body {
+      padding: 20px;
+    }
+
+    .endpoint-body p {
+      margin-bottom: 12px;
+    }
+
+    /* Tables */
+    .table-wrapper {
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+
+    .params-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 400px;
+    }
+
+    .params-table th,
+    .params-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      word-break: break-word;
+    }
+
+    .params-table th {
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 0.85rem;
+    }
+
+    .required-badge {
+      color: var(--error);
+      font-size: 0.75rem;
+      margin-left: 6px;
+    }
+
+    .optional-badge {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-left: 6px;
+    }
+
+    /* Callouts */
+    .info-callout {
+      background: rgba(248, 81, 73, 0.1);
+      border: 1px solid var(--primary);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 24px 0;
+    }
+
+    .info-callout h4 {
+      color: var(--primary-light);
+      margin-bottom: 8px;
+    }
+
+    .warning-callout {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid var(--warning);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 24px 0;
+    }
+
+    .warning-callout h4 {
+      color: var(--warning);
+      margin-bottom: 8px;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge-solana { background: rgba(153, 69, 255, 0.2); color: var(--solana); }
+    .badge-base { background: rgba(0, 82, 255, 0.2); color: var(--base); }
+    .badge-standard { background: #374151; color: #9ca3af; }
+    .badge-premium { background: rgba(248, 81, 73, 0.2); color: var(--primary-light); }
+    .badge-enterprise { background: rgba(248, 81, 73, 0.3); color: #ff7a73; }
+
+    /* CTA Box */
+    .cta-box {
+      background: rgba(248, 81, 73, 0.08);
+      border: 1px solid var(--primary);
+      border-radius: 12px;
+      padding: 32px;
+      text-align: center;
+      margin-top: 48px;
+    }
+
+    .cta-box h3 {
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .cta-box p {
+      margin-bottom: 20px;
+    }
+
+    .default-tag {
+      margin-left: auto;
+      color: var(--success);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .docs-content {
+        padding: 24px 32px;
+      }
+    }
+
+    @media (max-width: 968px) {
+      .docs-sidebar {
+        display: none;
+      }
+      .docs-content {
+        margin-left: 0;
+        padding: 20px;
+        max-width: 100%;
+      }
+      .nav-links {
+        display: none;
+      }
+      .code-block {
+        padding: 12px;
+      }
+      .code-block pre {
+        font-size: 0.75rem;
+      }
+      .params-table th,
+      .params-table td {
+        padding: 8px;
+        font-size: 0.85rem;
+      }
+      .endpoint-header {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .endpoint-path {
+        font-size: 0.85rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .docs-content h1 {
+        font-size: 1.75rem;
+      }
+      .docs-content h2 {
+        font-size: 1.35rem;
+      }
+      .navbar {
+        padding: 12px 16px;
+      }
+      .logo {
+        font-size: 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="logo">
+        <img src="/logo.png" alt="AgentToll" class="logo-icon-img">
+        <img src="/Copilot_20260217_123447.png" alt="AgentToll" class="logo-text-img">
+      </a>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/docs" class="active">Docs</a>
+        <a href="/api/docs">API Reference</a>
+        <a href="/#get-started" class="btn btn-primary">Get Started</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <h4>Getting Started</h4>
+      <a href="#overview">Overview</a>
+      <a href="#quick-start">Quick Start</a>
+      <a href="#authentication">Authentication</a>
+      
+      <h4>Core Concepts</h4>
+      <a href="#how-tolling-works">How Tolling Works</a>
+      <a href="#access-modes">Access Modes</a>
+      <a href="#networks">Networks</a>
+      <a href="#pricing-tiers">Pricing Tiers</a>
+      
+      <h4>Publisher Guide</h4>
+      <a href="#register">Registration</a>
+      <a href="#middleware">Middleware Setup</a>
+      <a href="#settings">Settings</a>
+      
+      <h4>API Reference</h4>
+      <a href="#payment-endpoints">Payment</a>
+      <a href="#verify-endpoints">Verification</a>
+      <a href="/api/docs" target="_blank">Full API →</a>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="docs-content">
+      <h1>Documentation</h1>
+      <p>Everything you need to integrate AgentToll into your API.</p>
+
+      <!-- Overview -->
+      <section id="overview">
+        <h2>Overview</h2>
+        <p>
+          AgentToll lets you monetize your API for AI agents with micropayments. 
+          When an agent requests your data, they pay a small USDC toll and get instant access.
+        </p>
+        
+        <div class="info-callout">
+          <h4>💡 Key Benefits</h4>
+          <ul>
+            <li>Simple integration with Express, Next.js, Cloudflare Workers</li>
+            <li>Instant USDC payments on Solana or Base</li>
+            <li>Standard HTTP 402 protocol for cross-agent compatibility</li>
+            <li>No subscriptions to manage - pure pay-per-use</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Quick Start -->
+      <section id="quick-start">
+        <h2>Quick Start</h2>
+        
+        <h3>1. Register as a Publisher</h3>
+        <div class="code-block">
+          <pre>curl -X POST https://toll.agenttoll.io/api/publisher/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Your Company",
+    "email": "you@example.com",
+    "wallets": { "solana": "YOUR_WALLET_ADDRESS" }
+  }'</pre>
+        </div>
+        <p>You'll receive an API key like <code>pk_live_abc123...</code></p>
+
+        <h3>2. Install the SDK</h3>
+        <div class="code-block">
+          <pre>npm install @agenttoll/sdk</pre>
+        </div>
+
+        <h3>3. Add to Your Server</h3>
+        <div class="code-block">
+          <pre>const express = require('express');
+const tollbooth = require('@agenttoll/sdk');
+
+const app = express();
+
+// Toll all routes under /api/premium
+app.use('/api/premium', tollbooth('pk_live_xxx', {
+  amount: 0.01,
+  freeForHumans: true
+}));
+
+app.get('/api/premium/data', (req, res) => {
+  res.json({ premium: 'data' });
+});</pre>
+        </div>
+        <p><strong>That's it!</strong> Your API now accepts USDC payments from AI agents.</p>
+      </section>
+
+      <!-- Authentication -->
+      <section id="authentication">
+        <h2>Authentication</h2>
+        
+        <table class="params-table">
+          <tr>
+            <th>Header</th>
+            <th>Use Case</th>
+            <th>Example</th>
+          </tr>
+          <tr>
+            <td><code>X-Publisher-Key</code></td>
+            <td>Publisher API calls (settings, analytics)</td>
+            <td><code>X-Publisher-Key: pk_live_xxx</code></td>
+          </tr>
+          <tr>
+            <td><code>Authorization</code></td>
+            <td>Agent accessing tolled resources</td>
+            <td><code>Authorization: Bearer eyJhbG...</code></td>
+          </tr>
+        </table>
+      </section>
+
+      <!-- How Tolling Works -->
+      <section id="how-tolling-works">
+        <h2>How Tolling Works</h2>
+        
+        <div class="endpoint-card">
+          <div class="endpoint-body">
+            <p><strong>The Payment Flow:</strong></p>
+            <ol>
+              <li><strong>Agent requests your API</strong> — <code>GET /api/premium/weather</code></li>
+              <li><strong>Tollbooth returns 402</strong> — Detects AI agent by User-Agent</li>
+              <li><strong>Agent reads payment info</strong> — Amount, wallet, supported networks</li>
+              <li><strong>Agent sends USDC</strong> — Direct transfer on Solana or Base</li>
+              <li><strong>Agent calls /api/pay</strong> — With transaction proof</li>
+              <li><strong>Receives access token</strong> — JWT for authorization</li>
+              <li><strong>Retries original request</strong> — With <code>Authorization: Bearer token</code></li>
+              <li><strong>Data delivered! ✅</strong></li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- Access Modes -->
+      <section id="access-modes">
+        <h2>Access Modes</h2>
+        <p>Choose how tokens grant access to your API. This controls what agents can do after paying.</p>
+        
+        <div class="endpoint-card">
+          <div class="endpoint-header">
+            <span class="method method-mode">MODE</span>
+            <span class="endpoint-path">per-request</span>
+          </div>
+          <div class="endpoint-body">
+            <p><strong>Token valid for exactly 1 API request</strong></p>
+            <p>Best for: High-value queries, expensive computations, preventing bulk scraping</p>
+            <div class="code-block">
+              <pre>// Publisher config
+{
+  "access_mode": "per-request",
+  "default_amount": 0.001  // $0.001 per query
+}
+
+// Agent pays → gets token → uses once → must pay again</pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-header">
+            <span class="method method-post">MODE</span>
+            <span class="endpoint-path">session</span>
+            <span class="default-tag">DEFAULT</span>
+          </div>
+          <div class="endpoint-body">
+            <p><strong>Token valid for specific resource within time window</strong></p>
+            <p>Best for: General API access, repeated queries to same endpoint</p>
+            <div class="code-block">
+              <pre>// Publisher config
+{
+  "access_mode": "session",
+  "access_duration": "1h",
+  "default_amount": 0.01  // $0.01 for 1 hour
+}
+
+// Agent can access same endpoint unlimited times for 1 hour</pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-header">
+            <span class="method method-patch">MODE</span>
+            <span class="endpoint-path">pass</span>
+          </div>
+          <div class="endpoint-body">
+            <p><strong>Token valid for ALL publisher endpoints within time window</strong></p>
+            <p>Best for: Content sites, documentation, full API exploration</p>
+            <div class="code-block">
+              <pre>// Publisher config
+{
+  "access_mode": "pass",
+  "access_duration": "24h",
+  "default_amount": 0.50  // $0.50 for 24h full access
+}
+
+// Agent gets full site access to any endpoint</pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="warning-callout">
+          <h4>⚠️ Choosing the Right Mode</h4>
+          <ul>
+            <li><strong>per-request</strong> — Maximum protection, higher friction</li>
+            <li><strong>session</strong> — Balanced, good for most APIs</li>
+            <li><strong>pass</strong> — Easiest for agents, allows more data access</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Networks -->
+      <section id="networks">
+        <h2>Supported Networks</h2>
+        <p>Payments are accepted in USDC on:</p>
+        
+        <table class="params-table">
+          <tr>
+            <th>Network</th>
+            <th>Currency</th>
+            <th>Contract/Mint</th>
+            <th>Speed</th>
+          </tr>
+          <tr>
+            <td><span class="badge badge-solana">Solana</span></td>
+            <td>USDC (SPL)</td>
+            <td><code>EPjFWdd5...TDt1v</code></td>
+            <td>~400ms</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-base">Base</span></td>
+            <td>USDC (ERC20)</td>
+            <td><code>0x833589...02913</code></td>
+            <td>~2s</td>
+          </tr>
+        </table>
+        
+        <div class="info-callout">
+          <h4>💡 Single Wallet OK</h4>
+          <p>You only need ONE network. If you only have a Solana wallet, that's fine!</p>
+        </div>
+      </section>
+
+      <!-- Pricing Tiers -->
+      <section id="pricing-tiers">
+        <h2>Pricing Tiers</h2>
+        
+        <table class="params-table">
+          <tr>
+            <th>Tier</th>
+            <th>Platform Fee</th>
+            <th>Requirements</th>
+          </tr>
+          <tr>
+            <td><span class="badge badge-standard">Standard</span></td>
+            <td>5%</td>
+            <td>Default for all publishers</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-premium">Premium</span></td>
+            <td>3%</td>
+            <td>&gt;$1000/mo revenue</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-enterprise">Enterprise</span></td>
+            <td>1% (customizable)</td>
+            <td>Custom contracts</td>
+          </tr>
+        </table>
+      </section>
+
+      <!-- 402 Response -->
+      <section id="402-response">
+        <h2>HTTP 402 Response Format</h2>
+        <p>When an agent needs to pay, they receive:</p>
+        
+        <div class="code-block">
+          <pre>{
+  "status": 402,
+  "message": "Payment Required",
+  "agent_instructions": "Pay 0.005 USDC to access...",
+  "payment": {
+    "amount": 0.005,
+    "currency": "USDC",
+    "network": "solana",
+    "receiver_wallet": "ABC123...",
+    "pay_url": "https://toll.agenttoll.io/pay?..."
+  },
+  "access": {
+    "mode": "session",
+    "duration": "1h"
+  },
+  "retry": {
+    "url": "https://your-api.com/data",
+    "headers": { "Authorization": "Bearer &lt;token&gt;" }
+  }
+}</pre>
+        </div>
+
+        <p><strong>Headers included:</strong></p>
+        <div class="code-block">
+          <pre>X-402-Version: 1
+X-402-Amount: 0.005
+X-402-Currency: USDC
+X-402-Pay-URL: https://toll.agenttoll.io/pay?...</pre>
+        </div>
+      </section>
+
+      <!-- Payment Endpoints -->
+      <section id="payment-endpoints">
+        <h2>Payment Endpoints</h2>
+        
+        <div class="endpoint-card">
+          <div class="endpoint-header">
+            <span class="method method-post">POST</span>
+            <span class="endpoint-path">/api/pay</span>
+          </div>
+          <div class="endpoint-body">
+            <p>Submit payment proof and receive access token.</p>
+            
+            <h4>Request Body</h4>
+            <table class="params-table">
+              <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Description</th>
+              </tr>
+              <tr>
+                <td><code>publisher</code><span class="required-badge">required</span></td>
+                <td>string</td>
+                <td>Publisher API key</td>
+              </tr>
+              <tr>
+                <td><code>amount</code><span class="required-badge">required</span></td>
+                <td>number</td>
+                <td>Amount paid in USDC</td>
+              </tr>
+              <tr>
+                <td><code>tx_signature</code></td>
+                <td>string</td>
+                <td>Solana transaction signature</td>
+              </tr>
+              <tr>
+                <td><code>tx_hash</code></td>
+                <td>string</td>
+                <td>Base transaction hash</td>
+              </tr>
+              <tr>
+                <td><code>network</code><span class="optional-badge">optional</span></td>
+                <td>string</td>
+                <td>solana (default) or base</td>
+              </tr>
+            </table>
+
+            <h4>Response</h4>
+            <div class="code-block">
+              <pre>{
+  "success": true,
+  "token": "eyJhbGciOiJIUzI1NiIs...",
+  "expires_in": 3600,
+  "access": {
+    "mode": "session",
+    "duration": "1h",
+    "scope": "single resource"
+  }
+}</pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="endpoint-card">
+          <div class="endpoint-header">
+            <span class="method method-get">GET</span>
+            <span class="endpoint-path">/api/pay/quote</span>
+          </div>
+          <div class="endpoint-body">
+            <p>Get payment quote before paying — wallet address, amount, fees, access mode.</p>
+            
+            <h4>Query Parameters</h4>
+            <table class="params-table">
+              <tr>
+                <td><code>publisher</code><span class="required-badge">required</span></td>
+                <td>Publisher API key</td>
+              </tr>
+              <tr>
+                <td><code>network</code><span class="optional-badge">optional</span></td>
+                <td>solana (default) or base</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Verify Endpoints -->
+      <section id="verify-endpoints">
+        <h2>Verification Endpoints</h2>
+        
+        <div class="endpoint-card">
+          <div class="endpoint-header">
+            <span class="method method-post">POST</span>
+            <span class="endpoint-path">/api/verify</span>
+          </div>
+          <div class="endpoint-body">
+            <p>Verify a payment token (middleware uses this internally).</p>
+            
+            <h4>Request Body</h4>
+            <table class="params-table">
+              <tr>
+                <td><code>token</code><span class="required-badge">required</span></td>
+                <td>JWT access token</td>
+              </tr>
+              <tr>
+                <td><code>publisher</code><span class="required-badge">required</span></td>
+                <td>Publisher API key</td>
+              </tr>
+              <tr>
+                <td><code>resource</code><span class="optional-badge">optional</span></td>
+                <td>Resource path for scope check</td>
+              </tr>
+            </table>
+
+            <h4>Response</h4>
+            <div class="code-block">
+              <pre>{
+  "valid": true,
+  "access": {
+    "mode": "session",
+    "scope": "/api/data",
+    "expires_at": "2024-01-15T12:00:00Z",
+    "uses_remaining": null
+  }
+}</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Registration -->
+      <section id="register">
+        <h2>Publisher Registration</h2>
+        
+        <div class="endpoint-card">
+          <div class="endpoint-header">
+            <span class="method method-post">POST</span>
+            <span class="endpoint-path">/api/publisher/register</span>
+          </div>
+          <div class="endpoint-body">
+            <p>Register as a publisher to receive payments.</p>
+            
+            <h4>Request Body</h4>
+            <table class="params-table">
+              <tr>
+                <td><code>name</code><span class="required-badge">required</span></td>
+                <td>Your company/project name</td>
+              </tr>
+              <tr>
+                <td><code>email</code><span class="required-badge">required</span></td>
+                <td>Contact email</td>
+              </tr>
+              <tr>
+                <td><code>wallets</code><span class="required-badge">required</span></td>
+                <td>Object with network addresses</td>
+              </tr>
+            </table>
+
+            <h4>Example</h4>
+            <div class="code-block">
+              <pre>{
+  "name": "Weather API Co",
+  "email": "api@weather.com",
+  "wallets": {
+    "solana": "ABC123...",
+    "base": "0x1234..."
+  }
+}</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Middleware -->
+      <section id="middleware">
+        <h2>Middleware Setup</h2>
+        
+        <h3>Express.js</h3>
+        <div class="code-block">
+          <pre>const tollbooth = require('@agenttoll/sdk');
+
+// Protect specific routes
+app.use('/api/premium', tollbooth('pk_live_xxx', {
+  amount: 0.01
+}));
+
+// Or with options
+app.use('/api/data', tollbooth('pk_live_xxx', {
+  amount: 0.005,
+  freeForHumans: true,
+  description: 'Weather data access'
+}));</pre>
+        </div>
+
+        <h3>Next.js API Routes</h3>
+        <div class="code-block">
+          <pre>import { withTollbooth } from '@agenttoll/sdk/next';
+
+export default withTollbooth({
+  publisherKey: 'pk_live_xxx',
+  amount: 0.01
+})(handler);</pre>
+        </div>
+
+        <h3>Cloudflare Workers</h3>
+        <div class="code-block">
+          <pre>import { tollboothEdge } from '@agenttoll/sdk/edge';
+
+export default {
+  async fetch(request, env) {
+    const tollResponse = await tollboothEdge(request, {
+      publisherKey: env.PUBLISHER_KEY,
+      amount: 0.01
+    });
+    if (tollResponse) return tollResponse;
+    
+    // Your handler...
+  }
+};</pre>
+        </div>
+      </section>
+
+      <!-- Settings -->
+      <section id="settings">
+        <h2>Publisher Settings</h2>
+        
+        <div class="endpoint-card">
+          <div class="endpoint-header">
+            <span class="method method-patch">PATCH</span>
+            <span class="endpoint-path">/api/publisher/settings</span>
+          </div>
+          <div class="endpoint-body">
+            <p>Update your publisher settings.</p>
+            
+            <h4>Available Settings</h4>
+            <table class="params-table">
+              <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Description</th>
+              </tr>
+              <tr>
+                <td><code>name</code></td>
+                <td>string</td>
+                <td>Publisher name</td>
+              </tr>
+              <tr>
+                <td><code>default_amount</code></td>
+                <td>number</td>
+                <td>Default toll price in USDC</td>
+              </tr>
+              <tr>
+                <td><code>access_mode</code></td>
+                <td>string</td>
+                <td>per-request, session, or pass</td>
+              </tr>
+              <tr>
+                <td><code>access_duration</code></td>
+                <td>string</td>
+                <td>Duration (1m, 5m, 1h, 24h, 7d)</td>
+              </tr>
+              <tr>
+                <td><code>webhooks.payment_received</code></td>
+                <td>string</td>
+                <td>URL to receive payment notifications</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <div class="cta-box">
+        <h3>Ready to integrate?</h3>
+        <p>Check the full API reference for all endpoints and examples.</p>
+        <a href="/api/docs" class="btn btn-primary">View Full API Reference →</a>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Highlight active sidebar link on scroll
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.docs-sidebar a[href^="#"]');
+    
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop - 100;
+        if (scrollY >= sectionTop) {
+          current = section.getAttribute('id');
+        }
+      });
+      
+      navLinks.forEach(link => {
+        link.style.background = '';
+        link.style.color = '';
+        if (link.getAttribute('href') === '#' + current) {
+          link.style.background = 'var(--bg-card)';
+          link.style.color = 'var(--text-primary)';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "name": "pay_toll",
+  "description": "Pay a micropayment toll to access a paywalled resource. Use this when you encounter an HTTP 402 Payment Required response. The tool handles the payment via Solana USDC and returns an access token for the resource.",
+  "strict": true,
+  "parameters": {
+    "type": "object",
+    "required": ["url", "amount"],
+    "properties": {
+      "url": {
+        "type": "string",
+        "description": "The URL of the resource that requires payment (from the 402 response)"
+      },
+      "amount": {
+        "type": "number", 
+        "description": "The payment amount in USDC (from the 402 response x402 headers or body)"
+      },
+      "max_amount": {
+        "type": "number",
+        "description": "Maximum amount you're willing to pay. If the requested amount exceeds this, the tool will not proceed. Default: 0.05 USDC"
+      },
+      "reason": {
+        "type": "string",
+        "description": "Why accessing this resource is valuable for your current task (helps with logging and human oversight)"
+      }
+    },
+    "additionalProperties": false
+  }
+}
