@@ -1,25 +1,41 @@
 /**
  * Analytics utilities for AgentToll
- * In production: Replace with Redis/PostgreSQL/ClickHouse
+ * Uses Supabase for persistence with in-memory fallback
  */
 
-// Import publishers store to count registered APIs
-import { publishers } from '../routes/publisher.js';
+// Import Supabase functions
+import { 
+  isSupabaseConfigured,
+  insertPayment as dbInsertPayment,
+  insertAccess as dbInsertAccess,
+  getPayments as dbGetPayments,
+  getAccesses as dbGetAccesses,
+  getPaymentStats as dbGetPaymentStats,
+  countPublishers as dbCountPublishers
+} from './supabase.js';
 
-// In-memory store for demo (use Redis/DB in production)
-const payments = [];
-const accesses = [];
+// Import publishers store for fallback
+import { publishers, getPublisherCount } from '../routes/publisher.js';
+
+// In-memory store fallback
+const paymentsMemory = [];
+const accessesMemory = [];
 
 /**
  * Record a payment event
  */
 export async function recordPayment(data) {
-  payments.push({
+  const payment = {
     ...data,
     id: `pay_${Date.now()}_${Math.random().toString(36).slice(2)}`,
-  });
+  };
   
-  // In production: write to database
+  if (isSupabaseConfigured()) {
+    await dbInsertPayment(payment);
+  } else {
+    paymentsMemory.push(payment);
+  }
+  
   console.log(`[Analytics] Payment recorded: ${data.amount} USDC from ${data.agent_id || 'unknown'}`);
 }
 
@@ -27,10 +43,59 @@ export async function recordPayment(data) {
  * Record an access event (token used)
  */
 export async function recordAccess(data) {
-  accesses.push({
+  const access = {
     ...data,
     id: `access_${Date.now()}_${Math.random().toString(36).slice(2)}`,
-  });
+  };
+  
+  if (isSupabaseConfigured()) {
+    await dbInsertAccess(access);
+  } else {
+    accessesMemory.push(access);
+  }
+}
+
+// Helper to get payments (from Supabase or memory)
+async function getPaymentsData(publisherKey = null, since = null) {
+  if (isSupabaseConfigured()) {
+    const data = await dbGetPayments(publisherKey, since);
+    // Convert Supabase format to expected format
+    return data.map(p => ({
+      ...p,
+      publisher: p.publisher_key,
+      timestamp: new Date(p.created_at).getTime(),
+    }));
+  }
+  
+  let payments = paymentsMemory;
+  if (publisherKey) {
+    payments = payments.filter(p => p.publisher === publisherKey);
+  }
+  if (since) {
+    payments = payments.filter(p => p.timestamp >= since);
+  }
+  return payments;
+}
+
+// Helper to get accesses (from Supabase or memory)
+async function getAccessesData(publisherKey = null, since = null) {
+  if (isSupabaseConfigured()) {
+    const data = await dbGetAccesses(publisherKey, since);
+    return data.map(a => ({
+      ...a,
+      publisher: a.publisher_key,
+      timestamp: new Date(a.created_at).getTime(),
+    }));
+  }
+  
+  let accesses = accessesMemory;
+  if (publisherKey) {
+    accesses = accesses.filter(a => a.publisher === publisherKey);
+  }
+  if (since) {
+    accesses = accesses.filter(a => a.timestamp >= since);
+  }
+  return accesses;
 }
 
 /**
@@ -41,12 +106,8 @@ export async function getAnalytics(publisherKey, timeframe = '24h') {
   const timeMs = parseTimeframe(timeframe);
   const cutoff = now - timeMs;
 
-  const relevantPayments = payments.filter(
-    p => p.publisher === publisherKey && p.timestamp >= cutoff
-  );
-  const relevantAccesses = accesses.filter(
-    a => a.publisher === publisherKey && a.timestamp >= cutoff
-  );
+  const relevantPayments = await getPaymentsData(publisherKey, cutoff);
+  const relevantAccesses = await getAccessesData(publisherKey, cutoff);
 
   const totalRevenue = relevantPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
   const uniqueAgents = new Set(relevantPayments.map(p => p.agent_id)).size;
@@ -74,7 +135,7 @@ export async function getAnalytics(publisherKey, timeframe = '24h') {
  * Get agent-specific stats (the AgentToll Analytics tab)
  */
 export async function getAgentStats(publisherKey) {
-  const relevantPayments = payments.filter(p => p.publisher === publisherKey);
+  const relevantPayments = await getPaymentsData(publisherKey);
 
   // Classify all paying agents
   const agentStats = {};
@@ -115,9 +176,7 @@ export async function getRevenueStats(publisherKey, timeframe = '7d') {
   const timeMs = parseTimeframe(timeframe);
   const cutoff = Date.now() - timeMs;
   
-  const relevantPayments = payments.filter(
-    p => p.publisher === publisherKey && p.timestamp >= cutoff
-  );
+  const relevantPayments = await getPaymentsData(publisherKey, cutoff);
 
   const dailyRevenue = {};
   relevantPayments.forEach(p => {
@@ -230,33 +289,34 @@ function getHourlyBreakdown(payments, timeMs) {
  * In production: cache this and update every minute
  */
 export async function getPlatformStats() {
-  // Get all registered publishers (APIs connected to AgentToll)
-  // This counts publishers even if they haven't received payments yet
-  const registeredPublishers = publishers.size;
+  // Get publisher count from Supabase or memory
+  const registeredPublishers = await getPublisherCount();
   
-  // Also count unique publishers from payments (for backwards compatibility)
-  const publishersWithPayments = new Set(payments.map(p => p.publisher)).size;
+  // Get payment stats
+  let totalRevenue, platformRevenue, publisherEarnings, totalTransactions, uniqueAgents;
   
-  // Use the higher count (registered publishers or those with payments)
-  const uniquePublishers = Math.max(registeredPublishers, publishersWithPayments);
-  
-  // Total revenue processed
-  const totalRevenue = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
-  
-  // Platform revenue (5% fee)
-  const platformRevenue = payments.reduce((sum, p) => sum + (p.platform_fee || p.amount * 0.05), 0);
-  
-  // Publisher earnings (95%)
-  const publisherEarnings = payments.reduce((sum, p) => sum + (p.publisher_receives || p.amount * 0.95), 0);
-  
-  // Total transactions
-  const totalTransactions = payments.length;
-  
-  // Unique agents
-  const uniqueAgents = new Set(payments.filter(p => p.agent_id).map(p => p.agent_id)).size;
+  if (isSupabaseConfigured()) {
+    const stats = await dbGetPaymentStats();
+    totalRevenue = stats.volume;
+    platformRevenue = stats.platformRevenue;
+    publisherEarnings = stats.publisherEarnings;
+    totalTransactions = stats.total;
+    
+    // Get unique agents from all payments
+    const allPayments = await dbGetPayments();
+    uniqueAgents = new Set(allPayments.filter(p => p.agent_id).map(p => p.agent_id)).size;
+  } else {
+    // Fallback to in-memory
+    const payments = paymentsMemory;
+    totalRevenue = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
+    platformRevenue = payments.reduce((sum, p) => sum + (p.platform_fee || p.amount * 0.05), 0);
+    publisherEarnings = payments.reduce((sum, p) => sum + (p.publisher_receives || p.amount * 0.95), 0);
+    totalTransactions = payments.length;
+    uniqueAgents = new Set(payments.filter(p => p.agent_id).map(p => p.agent_id)).size;
+  }
 
   return {
-    publishers: uniquePublishers,
+    publishers: registeredPublishers,
     total_volume_usdc: totalRevenue,
     platform_revenue_usdc: platformRevenue,
     publisher_earnings_usdc: publisherEarnings,

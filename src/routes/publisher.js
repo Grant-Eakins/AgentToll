@@ -1,11 +1,49 @@
 import { Router } from 'express';
 import { v4 as uuidv4 } from 'uuid';
+import { 
+  isSupabaseConfigured, 
+  createPublisher as dbCreatePublisher, 
+  getPublisherByKey as dbGetPublisher,
+  updatePublisher as dbUpdatePublisher,
+  countPublishers as dbCountPublishers 
+} from '../utils/supabase.js';
 
 const router = Router();
 
-// Shared publisher store - import this in payment.js
-// In production: use database
-export const publishers = new Map();
+// In-memory fallback when Supabase is not configured
+const publishersMemory = new Map();
+
+// Helper to get publisher (from Supabase or memory)
+export async function getPublisher(apiKey) {
+  if (isSupabaseConfigured()) {
+    return await dbGetPublisher(apiKey);
+  }
+  return publishersMemory.get(apiKey);
+}
+
+// Helper to set publisher (to Supabase or memory)
+async function setPublisher(apiKey, publisher, isNew = false) {
+  if (isSupabaseConfigured()) {
+    if (isNew) {
+      return await dbCreatePublisher(publisher);
+    } else {
+      return await dbUpdatePublisher(apiKey, publisher);
+    }
+  }
+  publishersMemory.set(apiKey, publisher);
+  return publisher;
+}
+
+// Export for backwards compatibility (platform stats)
+export const publishers = publishersMemory;
+
+// Export count function for analytics
+export async function getPublisherCount() {
+  if (isSupabaseConfigured()) {
+    return await dbCountPublishers();
+  }
+  return publishersMemory.size;
+}
 
 /**
  * POST /api/publisher/register
@@ -62,7 +100,8 @@ router.post('/register', async (req, res) => {
     },
   };
 
-  publishers.set(apiKey, publisher);
+  // Save to database or memory
+  await setPublisher(apiKey, publisher, true);
 
   res.json({
     success: true,
@@ -81,14 +120,14 @@ router.post('/register', async (req, res) => {
  * GET /api/publisher/me
  * Get current publisher info
  */
-router.get('/me', (req, res) => {
+router.get('/me', async (req, res) => {
   const apiKey = req.headers['x-publisher-key'];
   
   if (!apiKey) {
     return res.status(401).json({ error: 'API key required' });
   }
 
-  const publisher = publishers.get(apiKey);
+  const publisher = await getPublisher(apiKey);
   
   if (!publisher) {
     return res.status(404).json({ error: 'Publisher not found' });
@@ -103,14 +142,14 @@ router.get('/me', (req, res) => {
  * PATCH /api/publisher/settings
  * Update publisher settings
  */
-router.patch('/settings', (req, res) => {
+router.patch('/settings', async (req, res) => {
   const apiKey = req.headers['x-publisher-key'];
   
   if (!apiKey) {
     return res.status(401).json({ error: 'API key required' });
   }
 
-  const publisher = publishers.get(apiKey);
+  const publisher = await getPublisher(apiKey);
   
   if (!publisher) {
     return res.status(404).json({ error: 'Publisher not found' });
@@ -168,7 +207,7 @@ router.patch('/settings', (req, res) => {
   if (wallets?.solana !== undefined) publisher.wallets.solana = wallets.solana;
   if (wallets?.base !== undefined) publisher.wallets.base = wallets.base;
 
-  publishers.set(apiKey, publisher);
+  await setPublisher(apiKey, publisher);
 
   res.json({ success: true, settings: publisher.settings, wallets: publisher.wallets });
 });
@@ -177,14 +216,14 @@ router.patch('/settings', (req, res) => {
  * GET /api/publisher/revenue
  * Get revenue breakdown and settlement status
  */
-router.get('/revenue', (req, res) => {
+router.get('/revenue', async (req, res) => {
   const apiKey = req.headers['x-publisher-key'];
   
   if (!apiKey) {
     return res.status(401).json({ error: 'API key required' });
   }
 
-  const publisher = publishers.get(apiKey);
+  const publisher = await getPublisher(apiKey);
   
   if (!publisher) {
     return res.status(404).json({ error: 'Publisher not found' });
@@ -225,14 +264,14 @@ router.get('/revenue', (req, res) => {
  * PATCH /api/publisher/wallets
  * Update wallet addresses for different networks
  */
-router.patch('/wallets', (req, res) => {
+router.patch('/wallets', async (req, res) => {
   const apiKey = req.headers['x-publisher-key'];
   
   if (!apiKey) {
     return res.status(401).json({ error: 'API key required' });
   }
 
-  const publisher = publishers.get(apiKey);
+  const publisher = await getPublisher(apiKey);
   
   if (!publisher) {
     return res.status(404).json({ error: 'Publisher not found' });
@@ -252,7 +291,7 @@ router.patch('/wallets', (req, res) => {
     publisher.wallets.base = base;
   }
 
-  publishers.set(apiKey, publisher);
+  await setPublisher(apiKey, publisher);
 
   res.json({
     success: true,
@@ -265,7 +304,7 @@ router.patch('/wallets', (req, res) => {
  * POST /api/publisher/webhook
  * Set up payment webhooks
  */
-router.post('/webhook', (req, res) => {
+router.post('/webhook', async (req, res) => {
   const apiKey = req.headers['x-publisher-key'];
   const { webhook_url, events } = req.body;
 
@@ -273,7 +312,7 @@ router.post('/webhook', (req, res) => {
     return res.status(401).json({ error: 'API key required' });
   }
 
-  const publisher = publishers.get(apiKey);
+  const publisher = await getPublisher(apiKey);
   
   if (!publisher) {
     return res.status(404).json({ error: 'Publisher not found' });
@@ -285,7 +324,7 @@ router.post('/webhook', (req, res) => {
     secret: `whsec_${uuidv4().replace(/-/g, '')}`,
   };
 
-  publishers.set(apiKey, publisher);
+  await setPublisher(apiKey, publisher);
 
   res.json({
     success: true,

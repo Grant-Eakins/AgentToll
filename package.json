@@ -9,9 +9,18 @@
     "dev": "node --watch src/server.js",
     "test": "node --test tests/"
   },
-  "keywords": ["agenttoll", "openclaw", "ai-agents", "micropayments", "x402", "solana", "tollbooth"],
+  "keywords": [
+    "agenttoll",
+    "openclaw",
+    "ai-agents",
+    "micropayments",
+    "x402",
+    "solana",
+    "tollbooth"
+  ],
   "dependencies": {
     "@solana/web3.js": "^1.95.0",
+    "@supabase/supabase-js": "^2.96.0",
     "bs58": "^5.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.0",

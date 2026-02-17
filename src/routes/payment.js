@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { generateAccessToken } from '../utils/jwt.js';
 import { recordPayment } from '../utils/analytics.js';
-import { publishers } from './publisher.js';
+import { getPublisher } from './publisher.js';
 
 const router = Router();
 
@@ -100,7 +100,7 @@ router.post('/', async (req, res) => {
     }
 
     // Look up publisher and calculate fees based on their tier
-    const publisherData = publishers.get(publisher);
+    const publisherData = await getPublisher(publisher);
     const feePercent = getEffectiveFeePercent(publisherData);
     const platformFee = amount * (feePercent / 100);
     const publisherReceives = amount - platformFee;
@@ -110,7 +110,7 @@ router.post('/', async (req, res) => {
       publisherData.revenue.total_gross += amount;
       publisherData.revenue.total_net += publisherReceives;
       publisherData.revenue.platform_fees_paid += platformFee;
-      publishers.set(publisher, publisherData);
+      // Note: revenue updates are tracked via payment records in Supabase
     }
 
     // Get access mode settings from publisher
@@ -193,7 +193,7 @@ router.get('/quote', async (req, res) => {
   const { publisher: publisherKey, resource, network = 'solana' } = req.query;
   
   // Look up publisher to get their wallet and pricing
-  const publisherData = publishers.get(publisherKey);
+  const publisherData = await getPublisher(publisherKey);
   
   if (!publisherData) {
     return res.status(404).json({
@@ -324,7 +324,7 @@ router.post('/intent', async (req, res) => {
   }
 
   // Look up publisher
-  const publisherData = publishers.get(publisherKey);
+  const publisherData = await getPublisher(publisherKey);
   if (!publisherData) {
     return res.status(404).json({ error: 'Publisher not found' });
   }
