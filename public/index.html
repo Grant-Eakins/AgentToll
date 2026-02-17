@@ -30,12 +30,16 @@
   <!-- Hero -->
   <section class="hero">
     <div class="hero-content">
-      <p class="hero-eyebrow">AI Agent Toll Infrastructure</p>
+      <p class="hero-eyebrow">AI Agent Toll Infrastructure • Powered by x402</p>
       <h1>Monetize AI agent<br>traffic to your site</h1>
       <p class="hero-subtitle">
         Charge AI agents for accessing your APIs, content, or services. 
-        Drop-in middleware that detects agents and collects USDC payments on Solana or Base.
+        Drop-in middleware that detects agents and collects USDC payments on Solana or Base using the <strong>x402 protocol</strong>.
       </p>
+      <div class="x402-badge">
+        <span class="x402-icon">⚡</span>
+        <span class="x402-text">x402: The HTTP standard for AI agent payments. Returns <code>402 Payment Required</code> with machine-readable payment instructions.</span>
+      </div>
       <div class="hero-buttons">
         <a href="#get-started" class="btn btn-primary btn-large">Get Started</a>
         <a href="/docs" class="btn btn-ghost btn-large">Documentation →</a>
@@ -119,14 +123,14 @@ app.<span class="code-function">listen</span>(<span class="code-number">3000</sp
     <div class="container">
       <div class="section-header">
         <h2>How it works</h2>
-        <p>Four steps from request to payment. No changes to your business logic.</p>
+        <p>Four steps from request to payment using the x402 protocol. No changes to your business logic.</p>
       </div>
       
       <div class="flow-grid">
         <div class="flow-card">
           <div class="flow-number">1</div>
           <h3>Agent sends request</h3>
-          <p>AI agent calls your API. AgentToll middleware intercepts the request.</p>
+          <p>AI agent calls your API. AgentToll middleware intercepts and detects the agent.</p>
           <div class="flow-code">
             <code>GET /api/v1/weather?city=tokyo</code>
           </div>
@@ -134,17 +138,17 @@ app.<span class="code-function">listen</span>(<span class="code-number">3000</sp
         
         <div class="flow-card">
           <div class="flow-number">2</div>
-          <h3>402 Payment Required</h3>
-          <p>Without a valid token, agent receives payment instructions.</p>
+          <h3>x402: Payment Required</h3>
+          <p>Middleware returns HTTP 402 with x402-compliant payment instructions agents can parse.</p>
           <div class="flow-code">
-            <code>{ "amount": 0.001, "currency": "USDC" }</code>
+            <code>HTTP 402 + X-402-Amount: 0.001</code>
           </div>
         </div>
         
         <div class="flow-card">
           <div class="flow-number">3</div>
           <h3>Agent pays on Solana or Base</h3>
-          <p>Agent sends USDC to the wallet. Confirms in seconds.</p>
+          <p>Agent sends USDC to the wallet and submits tx proof. Confirms in seconds.</p>
           <div class="flow-code">
             <code>tx: 5K7x...confirmed</code>
           </div>
@@ -153,7 +157,7 @@ app.<span class="code-function">listen</span>(<span class="code-number">3000</sp
         <div class="flow-card">
           <div class="flow-number">4</div>
           <h3>Access granted</h3>
-          <p>Agent receives JWT token and retries. Your API returns data.</p>
+          <p>Agent receives JWT token and retries. Your API returns data normally.</p>
           <div class="flow-code">
             <code>Authorization: Bearer eyJhbG...</code>
           </div>

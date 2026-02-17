@@ -288,9 +288,46 @@ a:hover {
 .hero-subtitle {
   font-size: 1.25rem;
   color: var(--text-muted);
-  margin-bottom: 32px;
+  margin-bottom: 20px;
   max-width: 480px;
   line-height: 1.7;
+}
+
+.hero-subtitle strong {
+  color: var(--accent);
+}
+
+/* x402 Badge */
+.x402-badge {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(248, 81, 73, 0.1);
+  border: 1px solid rgba(248, 81, 73, 0.3);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  max-width: 480px;
+}
+
+.x402-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.x402-text {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.x402-text code {
+  background: var(--bg-elevated);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--accent);
 }
 
 .hero-buttons {
