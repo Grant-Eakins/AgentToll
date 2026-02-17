@@ -527,7 +527,7 @@
         
         <h3>1. Register as a Publisher</h3>
         <div class="code-block">
-          <pre>curl -X POST https://toll.agenttoll.io/api/publisher/register \
+          <pre>curl -X POST https://agenttoll-production.up.railway.app/api/publisher/register \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Your Company",
@@ -759,7 +759,7 @@ app.get('/api/premium/data', (req, res) => {
     "currency": "USDC",
     "network": "solana",
     "receiver_wallet": "ABC123...",
-    "pay_url": "https://toll.agenttoll.io/pay?..."
+    "pay_url": "https://agenttoll-production.up.railway.app/pay?..."
   },
   "access": {
     "mode": "session",
@@ -777,7 +777,7 @@ app.get('/api/premium/data', (req, res) => {
           <pre>X-402-Version: 1
 X-402-Amount: 0.005
 X-402-Currency: USDC
-X-402-Pay-URL: https://toll.agenttoll.io/pay?...</pre>
+X-402-Pay-URL: https://agenttoll-production.up.railway.app/pay?...</pre>
         </div>
       </section>
 
@@ -977,7 +977,7 @@ X-402-Pay-URL: https://toll.agenttoll.io/pay?...</pre>
         
         <h4>Option 2: cURL</h4>
         <div class="code-block">
-          <pre>curl -X POST https://toll.agenttoll.io/api/publisher/register \
+          <pre>curl -X POST https://agenttoll-production.up.railway.app/api/publisher/register \
   -H "Content-Type: application/json" \
   -d '{
     "name": "My API",
@@ -988,7 +988,7 @@ X-402-Pay-URL: https://toll.agenttoll.io/pay?...</pre>
 
         <h4>Option 3: Programmatic (JavaScript)</h4>
         <div class="code-block">
-          <pre>const response = await fetch('https://toll.agenttoll.io/api/publisher/register', {
+          <pre>const response = await fetch('/api/publisher/register', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({

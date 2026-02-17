@@ -3,6 +3,9 @@
  * In production: Replace with Redis/PostgreSQL/ClickHouse
  */
 
+// Import publishers store to count registered APIs
+import { publishers } from '../routes/publisher.js';
+
 // In-memory store for demo (use Redis/DB in production)
 const payments = [];
 const accesses = [];
@@ -227,8 +230,15 @@ function getHourlyBreakdown(payments, timeMs) {
  * In production: cache this and update every minute
  */
 export async function getPlatformStats() {
-  // Get unique publishers (APIs using AgentToll)
-  const uniquePublishers = new Set(payments.map(p => p.publisher)).size;
+  // Get all registered publishers (APIs connected to AgentToll)
+  // This counts publishers even if they haven't received payments yet
+  const registeredPublishers = publishers.size;
+  
+  // Also count unique publishers from payments (for backwards compatibility)
+  const publishersWithPayments = new Set(payments.map(p => p.publisher)).size;
+  
+  // Use the higher count (registered publishers or those with payments)
+  const uniquePublishers = Math.max(registeredPublishers, publishersWithPayments);
   
   // Total revenue processed
   const totalRevenue = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
