@@ -16,18 +16,62 @@ function formatUSD(amount) {
   return '$' + amount.toFixed(2);
 }
 
+// Format large numbers
+function formatNumber(num) {
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1) + 'M';
+  } else if (num >= 1000) {
+    return (num / 1000).toFixed(1) + 'K';
+  }
+  return num.toLocaleString();
+}
+
 // Fetch and display live platform stats
 async function fetchPlatformStats() {
   try {
     const res = await fetch('/api/analytics/platform');
     const data = await res.json();
     
+    document.getElementById('stat-agents-stopped').textContent = formatNumber(data.agents_stopped || 0);
     document.getElementById('stat-publishers').textContent = data.publishers || 0;
     document.getElementById('stat-volume').textContent = formatUSD(data.total_volume_usdc || 0);
     document.getElementById('stat-publisher-earnings').textContent = formatUSD(data.publisher_earnings_usdc || 0);
     document.getElementById('stat-platform-revenue').textContent = formatUSD(data.platform_revenue_usdc || 0);
   } catch (err) {
     console.log('Stats unavailable');
+  }
+}
+
+// Live SSE updates for agents stopped counter
+let agentsStoppedCount = 0;
+
+function connectLiveUpdates() {
+  try {
+    const evtSource = new EventSource('/api/analytics/agents-stopped/live');
+    
+    evtSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      const el = document.getElementById('stat-agents-stopped');
+      
+      if (data.type === 'init') {
+        agentsStoppedCount = data.agents_stopped;
+        el.textContent = formatNumber(agentsStoppedCount);
+      } else if (data.type === 'agent_stopped') {
+        agentsStoppedCount++;
+        el.textContent = formatNumber(agentsStoppedCount);
+        // Brief highlight animation
+        el.style.color = '#22c55e';
+        setTimeout(() => { el.style.color = ''; }, 500);
+      }
+    };
+    
+    evtSource.onerror = () => {
+      // Reconnect after 5 seconds on error
+      evtSource.close();
+      setTimeout(connectLiveUpdates, 5000);
+    };
+  } catch (err) {
+    console.log('SSE unavailable');
   }
 }
 
@@ -155,6 +199,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Fetch live stats on load and every 30 seconds
   fetchPlatformStats();
   setInterval(fetchPlatformStats, 30000);
+  
+  // Connect to SSE for real-time agents stopped updates
+  connectLiveUpdates();
   
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
