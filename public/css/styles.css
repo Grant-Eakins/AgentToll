@@ -91,9 +91,9 @@ pre, code {
 }
 
 .nav-container {
-  max-width: 1200px;
+  max-width: min(1200px, 100%);
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 clamp(12px, 3vw, 24px);
   height: 100%;
   display: flex;
   align-items: center;
@@ -165,12 +165,12 @@ pre, code {
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: clamp(16px, 3vw, 32px);
 }
 
 .nav-links a {
   color: var(--text-muted);
-  font-size: 0.9375rem;
+  font-size: clamp(0.8125rem, 2vw, 0.9375rem);
   font-weight: 500;
 }
 
@@ -260,10 +260,10 @@ pre, code {
   min-height: 100vh;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 60px;
+  gap: clamp(24px, 5vw, 60px);
   align-items: center;
-  padding: 100px 24px 60px;
-  max-width: 1300px;
+  padding: clamp(80px, 10vw, 100px) clamp(16px, 3vw, 24px) clamp(40px, 5vw, 60px);
+  max-width: min(1300px, 100%);
   margin: 0 auto;
 }
 
@@ -298,7 +298,7 @@ pre, code {
 }
 
 .hero-eyebrow {
-  font-size: 0.875rem;
+  font-size: clamp(0.75rem, 2vw, 0.875rem);
   font-weight: 500;
   color: var(--accent);
   margin-bottom: 12px;
@@ -388,10 +388,6 @@ pre, code {
 }
 
 @media (max-width: 768px) {
-  .hero h1 {
-    font-size: 2.25rem;
-  }
-  
   .hero-title {
     min-height: 2.2em;
   }
@@ -399,11 +395,6 @@ pre, code {
   .hero-title .cursor {
     width: 2px;
     height: 0.8em;
-  }
-  
-  .hero {
-    padding-left: 20px;
-    padding-right: 20px;
   }
   
   .hero-code {
@@ -416,20 +407,8 @@ pre, code {
 }
 
 @media (max-width: 480px) {
-  .hero h1 {
-    font-size: 1.75rem;
-  }
-  
   .hero-title {
     min-height: 2em;
-  }
-  
-  .hero-eyebrow {
-    font-size: 0.75rem;
-  }
-  
-  .hero-subtitle {
-    font-size: 1rem;
   }
   
   .hero-buttons {
@@ -440,11 +419,6 @@ pre, code {
   .hero-buttons .btn {
     width: 100%;
     text-align: center;
-  }
-  
-  .hero {
-    padding-left: 16px;
-    padding-right: 16px;
   }
   
   .live-stats {
