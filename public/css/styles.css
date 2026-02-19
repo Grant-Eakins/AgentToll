@@ -47,10 +47,22 @@ body::before {
   left: 0;
   right: 0;
   bottom: 0;
-  background: url('/Gemini_Generated_Image_7v8bza7v8bza7v8b.png') center/cover no-repeat;
+  background: var(--bg);
+  background-image: url('/Gemini_Generated_Image_7v8bza7v8bza7v8b.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   filter: blur(4px);
   opacity: 0.25;
   z-index: -1;
+}
+
+/* Disable background image blur on mobile for performance */
+@media (max-width: 768px) {
+  body::before {
+    background-image: none;
+    filter: none;
+  }
 }
 
 a {
@@ -721,10 +733,13 @@ a:hover {
   padding: 80px 24px;
   width: 100%;
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .section-alt {
   background: var(--bg-raised);
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .section-header {
@@ -777,16 +792,20 @@ a:hover {
   .section-header p {
     font-size: 0.9375rem;
   }
-  
-  .container {
-    padding: 0 16px;
-  }
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 16px;
+  }
 }
 
 /* ==========================================
@@ -859,7 +878,8 @@ a:hover {
   color: var(--text-muted);
   background: none;
   padding: 0;
-  white-space: nowrap;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 @media (max-width: 480px) {
@@ -1056,6 +1076,11 @@ a:hover {
   padding: 28px;
 }
 
+/* Feature cards inside section-alt need elevated background for contrast */
+.section-alt .feature-card {
+  background: var(--bg-elevated);
+}
+
 .feature-icon {
   font-size: 1.5rem;
   margin-bottom: 14px;
@@ -1080,6 +1105,7 @@ a:hover {
   border-radius: 4px;
   padding: 14px 16px;
   overflow-x: auto;
+  max-width: 100%;
 }
 
 .feature-code pre {
@@ -1088,6 +1114,22 @@ a:hover {
   font-size: 0.75rem;
   line-height: 1.7;
   color: var(--text-muted);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+@media (max-width: 480px) {
+  .feature-card {
+    padding: 20px;
+  }
+  
+  .feature-code {
+    padding: 12px;
+  }
+  
+  .feature-code pre {
+    font-size: 0.6875rem;
+  }
 }
 
 /* ==========================================
