@@ -377,7 +377,7 @@ function openModal() {
     console.error('Modal not found');
     return;
   }
-  modal.style.display = 'flex';
+  modal.classList.add('active');
   document.body.style.overflow = 'hidden';
   
   // Reset to step 1
@@ -390,7 +390,7 @@ function openModal() {
 
 function closeModal() {
   const modal = document.getElementById('register-modal');
-  if (modal) modal.style.display = 'none';
+  if (modal) modal.classList.remove('active');
   document.body.style.overflow = '';
 }
 

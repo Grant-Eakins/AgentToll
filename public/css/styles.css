@@ -719,6 +719,8 @@ a:hover {
    ========================================== */
 .section {
   padding: 80px 24px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .section-alt {
@@ -1326,8 +1328,6 @@ a:hover {
 }
 
 .footer-brand {
-
-.footer-brand {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -1380,13 +1380,17 @@ a:hover {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100%;
+  height: 100%;
   z-index: 10000;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   padding: 20px;
+}
+
+.modal.active {
+  display: flex;
 }
 
 .modal-backdrop {
@@ -1397,10 +1401,12 @@ a:hover {
   bottom: 0;
   background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(4px);
+  z-index: 1;
 }
 
 .modal-content {
   position: relative;
+  z-index: 2;
   background: var(--bg-raised);
   border: 1px solid var(--border);
   border-radius: 16px;
