@@ -6,6 +6,147 @@ function toggleMenu() {
   navLinks.classList.toggle('active');
 }
 
+// ==========================================
+// Scramble Typewriter Effect for Hero Title
+// ==========================================
+const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*';
+
+function scrambleTypewriter(element) {
+  const text = element.dataset.text;
+  const highlightRange = element.dataset.highlight.split(',').map(Number); // [start, end]
+  const lines = text.split('|');
+  
+  let currentIndex = 0;
+  let scrambleCount = 0;
+  const maxScrambles = 3; // How many random chars before revealing
+  const typeSpeed = 50; // ms per character
+  const scrambleSpeed = 30; // ms per scramble iteration
+  
+  // Flatten all characters with metadata
+  const allChars = [];
+  let charIndex = 0;
+  
+  lines.forEach((line, lineIndex) => {
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      const isHighlight = charIndex >= highlightRange[0] && charIndex < highlightRange[1];
+      allChars.push({
+        char: char,
+        isSpace: char === ' ',
+        isHighlight: isHighlight,
+        lineBreakAfter: false
+      });
+      charIndex++;
+    }
+    if (lineIndex < lines.length - 1) {
+      // Mark the last char of this line needs a line break after
+      if (allChars.length > 0) {
+        allChars[allChars.length - 1].lineBreakAfter = true;
+      }
+    }
+  });
+  
+  // Build initial HTML structure
+  function buildHTML() {
+    let html = '';
+    
+    allChars.forEach((charData, idx) => {
+      const highlightClass = charData.isHighlight ? ' highlight-char' : '';
+      // Use data attribute to store the character, handle space specially
+      const displayChar = charData.isSpace ? '&nbsp;' : '';
+      html += `<span class="char${highlightClass}" data-idx="${idx}">${displayChar}</span>`;
+      if (charData.lineBreakAfter) {
+        html += '<br>';
+      }
+    });
+    
+    html += '<span class="cursor"></span>';
+    return html;
+  }
+  
+  element.innerHTML = buildHTML();
+  
+  const charElements = element.querySelectorAll('.char');
+  const cursor = element.querySelector('.cursor');
+  const totalChars = allChars.length;
+  
+  // Position cursor after a character
+  function moveCursor(index) {
+    if (index < charElements.length) {
+      charElements[index].after(cursor);
+    }
+  }
+  
+  // Start cursor after first char position (before any typing)
+  charElements[0].before(cursor);
+  
+  function getRandomChar() {
+    return CHARS[Math.floor(Math.random() * CHARS.length)];
+  }
+  
+  function typeNextChar() {
+    if (currentIndex >= totalChars) {
+      // Done typing - move cursor to end, then hide after delay
+      setTimeout(() => {
+        cursor.style.display = 'none';
+        // Apply permanent highlight to AI agent
+        charElements.forEach((el, idx) => {
+          if (allChars[idx].isHighlight) {
+            el.classList.add('highlight');
+          }
+        });
+      }, 1000);
+      return;
+    }
+    
+    const charData = allChars[currentIndex];
+    const currentEl = charElements[currentIndex];
+    const targetChar = charData.char;
+    
+    if (charData.isSpace) {
+      // Skip scramble for spaces - already has &nbsp;
+      currentEl.classList.add('revealed');
+      moveCursor(currentIndex);
+      currentIndex++;
+      setTimeout(typeNextChar, typeSpeed / 2);
+      return;
+    }
+    
+    // Scramble phase
+    scrambleCount = 0;
+    
+    function scramble() {
+      if (scrambleCount < maxScrambles) {
+        currentEl.textContent = getRandomChar();
+        currentEl.classList.add('typing');
+        scrambleCount++;
+        setTimeout(scramble, scrambleSpeed);
+      } else {
+        // Reveal the actual character
+        currentEl.textContent = targetChar;
+        currentEl.classList.remove('typing');
+        currentEl.classList.add('revealed');
+        moveCursor(currentIndex);
+        currentIndex++;
+        setTimeout(typeNextChar, typeSpeed);
+      }
+    }
+    
+    scramble();
+  }
+  
+  // Start after a small delay
+  setTimeout(typeNextChar, 500);
+}
+
+// Initialize scramble typewriter on page load
+document.addEventListener('DOMContentLoaded', () => {
+  const heroTitle = document.getElementById('hero-title');
+  if (heroTitle && heroTitle.dataset.text) {
+    scrambleTypewriter(heroTitle);
+  }
+});
+
 // Format currency
 function formatUSD(amount) {
   if (amount >= 1000000) {
