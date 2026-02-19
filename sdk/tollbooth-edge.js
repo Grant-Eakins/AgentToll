@@ -36,6 +36,24 @@ async function verifyToken(token, apiKey) {
   }
 }
 
+/**
+ * Report agent stopped event to analytics (fire and forget)
+ */
+function reportAgentStopped(request, apiKey, amount) {
+  fetch(`${TOLL_API_BASE}/api/analytics/agent-stopped`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      publisher: apiKey,
+      resource: new URL(request.url).pathname,
+      agent_id: request.headers.get('x-agenttoll-id') || request.headers.get('x-agent-id'),
+      agent_type: request.headers.get('x-agent-type'),
+      user_agent: request.headers.get('user-agent'),
+      amount_required: amount,
+    }),
+  }).catch(() => {}); // Silently ignore errors
+}
+
 function build402(request, apiKey, amount) {
   const url = new URL(request.url);
   return {
@@ -94,6 +112,10 @@ export function tollgate(apiKey, options = {}) {
 
       // Return 402
       const paymentInfo = build402(request, apiKey, amount);
+      
+      // Report agent stopped (fire and forget)
+      reportAgentStopped(request, apiKey, amount);
+      
       return new Response(JSON.stringify(paymentInfo), {
         status: 402,
         headers: {
@@ -122,6 +144,9 @@ export function tollMiddleware(apiKey, options = {}) {
     const auth = request.headers.get('authorization') || '';
     const token = auth.replace(/^Bearer\s+/i, '');
     if (token && await verifyToken(token, apiKey)) return next();
+
+    // Report agent stopped (fire and forget)
+    reportAgentStopped(request, apiKey, amount);
 
     const paymentInfo = build402(request, apiKey, amount);
     return new Response(JSON.stringify(paymentInfo), {

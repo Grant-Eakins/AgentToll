@@ -79,6 +79,22 @@ async function verifyToken(token, apiKey) {
 }
 
 /**
+ * Report agent stopped event to analytics
+ * Called when returning 402 to an agent
+ */
+async function reportAgentStopped(data) {
+  try {
+    await fetch(`${TOLL_API_BASE}/api/analytics/agent-stopped`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+  } catch {
+    // Silently fail - don't affect the main flow
+  }
+}
+
+/**
  * Build 402 Payment Required response for agents
  * Includes onboarding info for non-x402 capable agents
  */
@@ -151,7 +167,7 @@ function build402Response(req, options) {
       sdk_install: "npm install @agenttoll/sdk",
       sample_integration: `${TOLL_API_BASE}/docs#pay-toll-tool`,
       operator_dashboard: `${TOLL_API_BASE}/dashboard`,
-      support: "support@agenttoll.io"
+      support: "https://x.com/0xgrante"
     };
   }
 
@@ -234,6 +250,16 @@ function tollbooth(apiKey, options = {}) {
 
     // Check if agent advertises x402 capability
     const isX402Capable = req.headers['x-402-capable'] === 'true';
+
+    // Report agent stopped event (fire and forget - don't block response)
+    reportAgentStopped({
+      publisher: apiKey,
+      resource: req.path,
+      agent_id: req.headers['x-agenttoll-id'] || req.headers['x-agent-id'] || null,
+      agent_type: req.headers['x-agent-type'] || null,
+      user_agent: req.headers['user-agent'] || null,
+      amount_required: config.amount,
+    }).catch(() => {}); // Silently ignore errors
 
     // Set x402 headers for agent parsing
     res.setHeader('X-402-Version', '1');

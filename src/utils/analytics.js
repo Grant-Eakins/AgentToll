@@ -11,7 +11,10 @@ import {
   getPayments as dbGetPayments,
   getAccesses as dbGetAccesses,
   getPaymentStats as dbGetPaymentStats,
-  countPublishers as dbCountPublishers
+  countPublishers as dbCountPublishers,
+  insertAgentStop as dbInsertAgentStop,
+  getAgentStopCount as dbGetAgentStopCount,
+  getAgentStops as dbGetAgentStops
 } from './supabase.js';
 
 // Import publishers store for fallback
@@ -20,6 +23,10 @@ import { publishers, getPublisherCount } from '../routes/publisher.js';
 // In-memory store fallback
 const paymentsMemory = [];
 const accessesMemory = [];
+const agentStopsMemory = [];
+
+// SSE clients for real-time updates
+const sseClients = new Set();
 
 /**
  * Record a payment event
@@ -53,6 +60,110 @@ export async function recordAccess(data) {
   } else {
     accessesMemory.push(access);
   }
+}
+
+/**
+ * Record an agent stopped event (402 returned - agent blocked until payment)
+ */
+export async function recordAgentStopped(data) {
+  const stopEvent = {
+    ...data,
+    id: `stop_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+    timestamp: data.timestamp || Date.now(),
+  };
+  
+  if (isSupabaseConfigured()) {
+    await dbInsertAgentStop(stopEvent);
+  } else {
+    agentStopsMemory.push(stopEvent);
+  }
+  
+  // Broadcast to all SSE clients
+  broadcastAgentStopped(stopEvent);
+  
+  console.log(`[Analytics] Agent stopped: ${data.agent_id || 'unknown'} at ${data.resource || 'unknown resource'}`);
+}
+
+/**
+ * Get total agents stopped count (platform-wide)
+ */
+export async function getAgentStoppedCount() {
+  if (isSupabaseConfigured()) {
+    return await dbGetAgentStopCount();
+  }
+  return agentStopsMemory.length;
+}
+
+/**
+ * Get agent stops data
+ */
+export async function getAgentStopsData(publisherKey = null, since = null) {
+  if (isSupabaseConfigured()) {
+    const data = await dbGetAgentStops(publisherKey, since);
+    return data.map(s => ({
+      ...s,
+      publisher: s.publisher_key,
+      timestamp: new Date(s.created_at).getTime(),
+    }));
+  }
+  
+  let stops = agentStopsMemory;
+  if (publisherKey) {
+    stops = stops.filter(s => s.publisher === publisherKey);
+  }
+  if (since) {
+    stops = stops.filter(s => s.timestamp >= since);
+  }
+  return stops;
+}
+
+// ==========================================
+// SSE (Server-Sent Events) for Real-Time Updates
+// ==========================================
+
+/**
+ * Add an SSE client for real-time updates
+ */
+export function addSSEClient(res) {
+  sseClients.add(res);
+  
+  // Send current count immediately
+  getAgentStoppedCount().then(count => {
+    res.write(`data: ${JSON.stringify({ type: 'init', agents_stopped: count })}\n\n`);
+  });
+  
+  // Remove client on disconnect
+  res.on('close', () => {
+    sseClients.delete(res);
+  });
+}
+
+/**
+ * Broadcast agent stopped event to all SSE clients
+ */
+function broadcastAgentStopped(stopEvent) {
+  const message = JSON.stringify({
+    type: 'agent_stopped',
+    timestamp: stopEvent.timestamp,
+    publisher: stopEvent.publisher,
+    agent_type: stopEvent.agent_type,
+  });
+  
+  for (const client of sseClients) {
+    try {
+      client.write(`data: ${message}\n\n`);
+    } catch (err) {
+      // Client disconnected, remove from set
+      sseClients.delete(client);
+    }
+  }
+}
+
+/**
+ * Get current SSE client count
+ */
+export function getSSEClientCount() {
+  return sseClients.size;
 }
 
 // Helper to get payments (from Supabase or memory)
@@ -292,6 +403,9 @@ export async function getPlatformStats() {
   // Get publisher count from Supabase or memory
   const registeredPublishers = await getPublisherCount();
   
+  // Get agents stopped count
+  const agentsStopped = await getAgentStoppedCount();
+  
   // Get payment stats
   let totalRevenue, platformRevenue, publisherEarnings, totalTransactions, uniqueAgents;
   
@@ -317,6 +431,7 @@ export async function getPlatformStats() {
 
   return {
     publishers: registeredPublishers,
+    agents_stopped: agentsStopped,
     total_volume_usdc: totalRevenue,
     platform_revenue_usdc: platformRevenue,
     publisher_earnings_usdc: publisherEarnings,

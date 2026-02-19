@@ -192,7 +192,7 @@ router.patch('/settings', async (req, res) => {
       return res.status(403).json({ 
         error: 'Custom fees require enterprise tier',
         current_tier: publisher.tier,
-        hint: 'Contact sales@agenttoll.io for enterprise pricing',
+        hint: 'Contact @0xgrante on X for enterprise pricing',
       });
     }
     if (custom_fee_percent < 0 || custom_fee_percent > 15) {

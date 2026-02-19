@@ -275,4 +275,79 @@ export async function getAccesses(publisherKey = null, since = null) {
   return data || [];
 }
 
+// ==========================================
+// AGENT STOPS OPERATIONS
+// ==========================================
+
+/**
+ * Record an agent stop event (402 returned)
+ */
+export async function insertAgentStop(stopEvent) {
+  if (!supabase) return null;
+  
+  const { data, error } = await supabase
+    .from('agent_stops')
+    .insert({
+      id: stopEvent.id,
+      publisher_key: stopEvent.publisher,
+      resource: stopEvent.resource,
+      agent_id: stopEvent.agent_id,
+      agent_type: stopEvent.agent_type,
+      user_agent: stopEvent.user_agent,
+      amount_required: stopEvent.amount_required,
+      created_at: new Date(stopEvent.timestamp).toISOString(),
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Supabase insertAgentStop error:', error);
+    return null;
+  }
+  return data;
+}
+
+/**
+ * Get total agent stops count (platform-wide)
+ */
+export async function getAgentStopCount() {
+  if (!supabase) return 0;
+  
+  const { count, error } = await supabase
+    .from('agent_stops')
+    .select('*', { count: 'exact', head: true });
+
+  if (error) {
+    console.error('Supabase getAgentStopCount error:', error);
+    return 0;
+  }
+  return count || 0;
+}
+
+/**
+ * Get agent stops for a specific publisher
+ */
+export async function getAgentStops(publisherKey = null, since = null) {
+  if (!supabase) return [];
+  
+  let query = supabase.from('agent_stops').select('*');
+  
+  if (publisherKey) {
+    query = query.eq('publisher_key', publisherKey);
+  }
+  if (since) {
+    query = query.gte('created_at', new Date(since).toISOString());
+  }
+  
+  query = query.order('created_at', { ascending: false });
+  
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('Supabase getAgentStops error:', error);
+    return [];
+  }
+  return data || [];
+}
+
 console.log(supabase ? '✅ Supabase connected' : '⚠️  Supabase not configured - using in-memory fallback');
