@@ -307,7 +307,7 @@ pre, code {
 }
 
 .hero h1 {
-  font-size: clamp(1.5rem, 5vw, 3.25rem);
+  font-size: clamp(1.25rem, 4vw, 3.25rem);
   font-weight: 700;
   line-height: 1.3;
   color: var(--text);
@@ -490,7 +490,7 @@ pre, code {
   background: var(--bg-raised);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 20px;
+  padding: clamp(12px, 3vw, 20px);
   max-width: min(480px, 100%);
   width: 100%;
 }
@@ -499,11 +499,11 @@ pre, code {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.75rem;
+  font-size: clamp(0.625rem, 1.5vw, 0.75rem);
   color: var(--text-faint);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 16px;
+  margin-bottom: clamp(10px, 2vw, 16px);
 }
 
 .live-dot {
@@ -522,7 +522,7 @@ pre, code {
 .live-stats-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: clamp(8px, 2vw, 16px);
 }
 
 .live-stat {
@@ -531,14 +531,14 @@ pre, code {
 }
 
 .live-stat-value {
-  font-size: 1.5rem;
+  font-size: clamp(1rem, 3vw, 1.5rem);
   font-weight: 700;
   color: var(--text);
   font-family: var(--mono);
 }
 
 .live-stat-label {
-  font-size: 0.75rem;
+  font-size: clamp(0.625rem, 1.5vw, 0.75rem);
   color: var(--text-faint);
 }
 
@@ -546,54 +546,25 @@ pre, code {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
-  margin-top: 16px;
-  padding-top: 16px;
+  gap: clamp(4px, 1vw, 8px);
+  margin-top: clamp(10px, 2vw, 16px);
+  padding-top: clamp(10px, 2vw, 16px);
   border-top: 1px solid var(--border);
 }
 
 .supported-label {
-  font-size: 0.75rem;
+  font-size: clamp(0.625rem, 1.5vw, 0.75rem);
   color: var(--text-faint);
 }
 
 .agent-tag {
-  font-size: 0.6875rem;
+  font-size: clamp(0.5rem, 1.5vw, 0.6875rem);
   font-weight: 500;
-  padding: 4px 8px;
+  padding: clamp(2px, 0.5vw, 4px) clamp(4px, 1vw, 8px);
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-radius: 4px;
   color: var(--text-muted);
-}
-
-/* Live Stats Responsive */
-@media (max-width: 480px) {
-  .live-stats {
-    padding: 16px;
-  }
-  
-  .live-stats-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-  
-  .live-stat-value {
-    font-size: 1.25rem;
-  }
-  
-  .live-stat-label {
-    font-size: 0.6875rem;
-  }
-  
-  .supported-agents {
-    gap: 6px;
-  }
-  
-  .agent-tag {
-    font-size: 0.625rem;
-    padding: 3px 6px;
-  }
 }
 
 /* ==========================================
@@ -615,21 +586,21 @@ pre, code {
 
 .code-header {
   background: var(--bg-elevated);
-  padding: 10px 16px;
+  padding: clamp(6px, 1.5vw, 10px) clamp(10px, 2vw, 16px);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: clamp(8px, 1.5vw, 12px);
   border-bottom: 1px solid var(--border);
 }
 
 .code-dots {
   display: flex;
-  gap: 6px;
+  gap: clamp(4px, 1vw, 6px);
 }
 
 .code-dots .dot {
-  width: 10px;
-  height: 10px;
+  width: clamp(6px, 1.5vw, 10px);
+  height: clamp(6px, 1.5vw, 10px);
   border-radius: 50%;
 }
 
@@ -639,21 +610,21 @@ pre, code {
 
 .code-filename {
   color: var(--text-muted);
-  font-size: 0.8125rem;
+  font-size: clamp(0.625rem, 1.8vw, 0.8125rem);
   font-family: var(--mono);
 }
 
 .code-lang {
   margin-left: auto;
   color: var(--text-faint);
-  font-size: 0.75rem;
+  font-size: clamp(0.5rem, 1.5vw, 0.75rem);
 }
 
 .code-content {
-  padding: 20px;
+  padding: clamp(12px, 3vw, 20px);
   margin: 0;
   font-family: var(--mono);
-  font-size: 0.8125rem;
+  font-size: clamp(0.625rem, 1.8vw, 0.8125rem);
   line-height: 1.8;
   overflow-x: auto;
   color: var(--text);
@@ -671,34 +642,8 @@ pre, code {
 .code-property { color: #7ee787; }
 .code-variable { color: #ffa657; }
 
-/* Code Window Responsive */
-@media (max-width: 768px) {
-  .code-content {
-    padding: 16px;
-    font-size: 0.75rem;
-    line-height: 1.6;
-  }
-  
-  .code-header {
-    padding: 8px 12px;
-  }
-  
-  .code-dots .dot {
-    width: 8px;
-    height: 8px;
-  }
-}
-
+/* Hide code language on very small screens */
 @media (max-width: 480px) {
-  .code-content {
-    padding: 12px;
-    font-size: 0.6875rem;
-  }
-  
-  .code-filename {
-    font-size: 0.75rem;
-  }
-  
   .code-lang {
     display: none;
   }
@@ -708,7 +653,7 @@ pre, code {
    Sections
    ========================================== */
 .section {
-  padding: 80px 24px;
+  padding: clamp(48px, 8vw, 80px) clamp(12px, 3vw, 24px);
   width: 100%;
   box-sizing: border-box;
   overflow-x: hidden;
