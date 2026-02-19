@@ -57,14 +57,6 @@ body::before {
   z-index: -1;
 }
 
-/* Disable background image blur on mobile for performance */
-@media (max-width: 768px) {
-  body::before {
-    background-image: none;
-    filter: none;
-  }
-}
-
 a {
   color: var(--accent);
   text-decoration: none;
