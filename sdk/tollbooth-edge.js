@@ -10,8 +10,31 @@
 const TOLL_API_BASE = 'https://agenttoll-production.up.railway.app';
 
 const AGENT_PATTERNS = [
-  /agenttoll/i, /openclaw/i, /clawd/i, /openai-agent/i,
-  /anthropic-agent/i, /autogpt/i, /agentgpt/i, /babyagi/i,
+  // Platform-specific
+  /agenttoll/i, /openclaw/i, /clawd/i,
+  // Major AI providers
+  /claude/i, /anthropic/i, /openai/i, /gpt-4/i, /gpt-3/i, /chatgpt/i,
+  /gemini/i, /google-ai/i, /google-extended/i, /googlebot/i,
+  /bingbot/i, /bingpreview/i, /copilot/i, /perplexity/i, /perplexitybot/i,
+  /cohere/i, /mistral/i, /meta-ai/i, /llama/i,
+  // Agent frameworks
+  /langchain/i, /autogpt/i, /agentgpt/i, /babyagi/i, /crewai/i,
+  /superagent/i, /smolagent/i, /phidata/i, /haystack/i, /dify/i, /flowise/i,
+  // AI crawlers
+  /gptbot/i, /chatgpt-user/i, /oai-searchbot/i, /claudebot/i, /claude-web/i,
+  /anthropic-ai/i, /ccbot/i, /bytespider/i, /amazonbot/i, /petalbot/i,
+  // Social / platform bots
+  /facebookbot/i, /facebot/i, /twitterbot/i, /slackbot/i, /discordbot/i,
+  /telegrambot/i, /linkedinbot/i, /whatsapp/i, /yandexbot/i, /applebot/i,
+  // HTTP libraries (programmatic access)
+  /python-requests/i, /httpx/i, /axios/i, /node-fetch/i, /undici/i,
+  /go-http-client/i, /curl/i, /wget/i, /scrapy/i,
+  // Headless browsers
+  /headlesschrome/i, /phantomjs/i, /puppeteer/i, /playwright/i, /selenium/i,
+  // Generic catch-all: anything with bot, agent, crawler, spider, scraper
+  /bot[\s\/\-_]/i, /[\s\/\-_]bot$/i, /^bot$/i,
+  /agent[\s\/\-_]/i, /[\s\/\-_]agent$/i, /[\s\/\-_]agent[\s\/\-_]/i,
+  /crawler/i, /spider/i, /scraper/i,
 ];
 
 function isAgent(request) {

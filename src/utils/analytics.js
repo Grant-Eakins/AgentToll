@@ -343,9 +343,22 @@ function classifyAgent(userAgent) {
   if (ua.includes('agentgpt')) return 'agentgpt';
   if (ua.includes('babyagi')) return 'babyagi';
   if (ua.includes('langchain')) return 'langchain';
-  if (ua.includes('openai')) return 'openai-agent';
-  if (ua.includes('anthropic')) return 'anthropic-agent';
-  if (ua.includes('bot') || ua.includes('agent')) return 'other-agent';
+  if (ua.includes('crewai')) return 'crewai';
+  if (ua.includes('openai') || ua.includes('gptbot') || ua.includes('chatgpt')) return 'openai-agent';
+  if (ua.includes('anthropic') || ua.includes('claude')) return 'anthropic-agent';
+  if (ua.includes('gemini') || ua.includes('google-ai') || ua.includes('google-extended') || ua.includes('googlebot')) return 'google-agent';
+  if (ua.includes('bingbot') || ua.includes('bingpreview') || ua.includes('copilot')) return 'microsoft-agent';
+  if (ua.includes('perplexity')) return 'perplexity';
+  if (ua.includes('cohere')) return 'cohere';
+  if (ua.includes('mistral')) return 'mistral';
+  if (ua.includes('meta-ai') || ua.includes('llama') || ua.includes('facebookbot')) return 'meta-agent';
+  if (ua.includes('python-requests') || ua.includes('httpx') || ua.includes('scrapy')) return 'python-client';
+  if (ua.includes('axios') || ua.includes('node-fetch') || ua.includes('undici')) return 'node-client';
+  if (ua.includes('curl') || ua.includes('wget')) return 'cli-client';
+  if (ua.includes('puppeteer') || ua.includes('playwright') || ua.includes('selenium') || ua.includes('headlesschrome') || ua.includes('phantomjs')) return 'headless-browser';
+  if (/bot[\s\/\-_]|[\s\/\-_]bot$|^bot$/i.test(ua)) return 'other-bot';
+  if (/agent[\s\/\-_]|[\s\/\-_]agent$|[\s\/\-_]agent[\s\/\-_]/i.test(ua)) return 'other-agent';
+  if (/crawler|spider|scraper/i.test(ua)) return 'crawler';
   
   return 'unknown';
 }
