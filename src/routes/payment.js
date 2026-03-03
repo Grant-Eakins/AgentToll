@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { generateAccessToken } from '../utils/jwt.js';
-import { recordPayment } from '../utils/analytics.js';
+import { recordPayment, isSupabaseConfigured, dbIsTransactionUsed, dbMarkTransactionUsed } from '../utils/analytics.js';
 import { getPublisher } from './publisher.js';
 
 const router = Router();
@@ -19,6 +19,12 @@ const DEFAULT_FEE_PERCENT = parseFloat(process.env.PLATFORM_FEE_PERCENT || '5');
 const MINIMUM_AMOUNT = 0.05; // Minimum charge: $0.05 USDC
 const PLATFORM_SOLANA_WALLET = process.env.PLATFORM_SOLANA_WALLET;
 const PLATFORM_BASE_WALLET = process.env.PLATFORM_BASE_WALLET;
+
+// Transaction recency: reject txs older than this (in seconds)
+const TX_MAX_AGE_SECONDS = parseInt(process.env.TX_MAX_AGE_SECONDS || '600'); // 10 minutes
+
+// Replay protection: track used transaction signatures
+const usedTransactions = new Set();
 
 // Check platform wallet configuration
 const hasSolanaWallet = !!PLATFORM_SOLANA_WALLET;
@@ -52,19 +58,29 @@ function getEffectiveFeePercent() {
  *   - resource: URL being accessed
  *   - tx_signature: Solana transaction signature (for Solana payments)
  *   - tx_hash: Base transaction hash (for Base payments)
- *   - network: 'solana' or 'base' (default: 'solana')
+ *   - network: 'solana' or 'base' (REQUIRED)
  *   - agent_id: (optional) AgentToll/agent identifier
  */
 router.post('/', async (req, res) => {
   try {
-    const { publisher, amount, resource, tx_signature, tx_hash, network = 'solana', agent_id } = req.body;
+    const { publisher, amount, resource, tx_signature, tx_hash, network, agent_id } = req.body;
+
+    // Validate network is specified
+    if (!network || !['solana', 'base'].includes(network)) {
+      return res.status(400).json({
+        error: 'Network required',
+        message: "Specify network: 'solana' or 'base'",
+        supported_networks: ['solana', 'base'],
+        agent_hint: "Include 'network' field set to 'solana' or 'base' in your payment request.",
+      });
+    }
 
     // Validate required fields
     const txId = network === 'base' ? tx_hash : tx_signature;
     if (!publisher || !txId) {
       return res.status(400).json({
         error: 'Missing required fields',
-        required: ['publisher', network === 'base' ? 'tx_hash' : 'tx_signature'],
+        required: ['publisher', 'network', network === 'base' ? 'tx_hash' : 'tx_signature'],
         supported_networks: ['solana', 'base'],
         agent_hint: `Provide your ${network === 'base' ? 'Base transaction hash' : 'Solana transaction signature'} after sending payment`,
       });
@@ -77,6 +93,21 @@ router.post('/', async (req, res) => {
         minimum_amount: MINIMUM_AMOUNT,
         provided: parseFloat(amount),
         agent_hint: `Amount must be at least ${MINIMUM_AMOUNT} USDC`,
+      });
+    }
+
+    // Replay protection: check in-memory cache first, then Supabase
+    if (usedTransactions.has(txId)) {
+      return res.status(409).json({
+        error: 'Transaction already used',
+        agent_hint: 'This transaction signature has already been redeemed. Send a new payment.',
+      });
+    }
+    if (isSupabaseConfigured() && await dbIsTransactionUsed(txId)) {
+      usedTransactions.add(txId); // cache it locally too
+      return res.status(409).json({
+        error: 'Transaction already used',
+        agent_hint: 'This transaction signature has already been redeemed. Send a new payment.',
       });
     }
 
@@ -95,6 +126,12 @@ router.post('/', async (req, res) => {
         network,
         agent_hint: 'Transaction not found or amount mismatch. Retry payment.',
       });
+    }
+
+    // Mark transaction as used (replay protection) — persist to Supabase + local cache
+    usedTransactions.add(txId);
+    if (isSupabaseConfigured()) {
+      await dbMarkTransactionUsed(txId, { network, publisherKey: publisher, amount });
     }
 
     // Look up publisher and calculate fees (flat 5%)
@@ -188,7 +225,16 @@ router.post('/', async (req, res) => {
  * Returns publisher's wallet for direct payment + platform fee info
  */
 router.get('/quote', async (req, res) => {
-  const { publisher: publisherKey, resource, network = 'solana' } = req.query;
+  const { publisher: publisherKey, resource, network } = req.query;
+
+  if (!network || !['solana', 'base'].includes(network)) {
+    return res.status(400).json({
+      error: 'Network required',
+      message: "Specify network query param: 'solana' or 'base'",
+      supported_networks: ['solana', 'base'],
+      agent_hint: "Add &network=solana or &network=base to the quote URL.",
+    });
+  }
   
   // Look up publisher to get their wallet and pricing
   const publisherData = await getPublisher(publisherKey);
@@ -310,7 +356,16 @@ router.get('/quote', async (req, res) => {
  * For agents that want pre-built transactions
  */
 router.post('/intent', async (req, res) => {
-  const { publisher: publisherKey, amount, resource, payer_wallet, network = 'solana' } = req.body;
+  const { publisher: publisherKey, amount, resource, payer_wallet, network } = req.body;
+
+  if (!network || !['solana', 'base'].includes(network)) {
+    return res.status(400).json({
+      error: 'Network required',
+      message: "Specify network: 'solana' or 'base'",
+      supported_networks: ['solana', 'base'],
+      agent_hint: "Include 'network' field set to 'solana' or 'base' in your intent request.",
+    });
+  }
 
   if (!payer_wallet) {
     return res.status(400).json({
@@ -419,12 +474,24 @@ async function verifySolanaPayment(signature, expectedAmount) {
       return { valid: false, reason: 'Transaction failed' };
     }
 
-    // In production: verify USDC transfer amount and recipient
-    // For now, accept confirmed transactions
+    // Recency check: reject transactions older than TX_MAX_AGE_SECONDS
+    if (tx.blockTime) {
+      const txAgeSeconds = Math.floor(Date.now() / 1000) - tx.blockTime;
+      if (txAgeSeconds > TX_MAX_AGE_SECONDS) {
+        return { valid: false, reason: `Transaction too old (${txAgeSeconds}s ago, max ${TX_MAX_AGE_SECONDS}s)` };
+      }
+      if (txAgeSeconds < -60) {
+        // Transaction claims to be from the future (clock skew tolerance: 60s)
+        return { valid: false, reason: 'Transaction timestamp is in the future' };
+      }
+    }
+
+    // TODO: verify USDC transfer amount and recipient match expected values
     return { 
       valid: true, 
       amount: expectedAmount,
       block: tx.slot,
+      blockTime: tx.blockTime,
     };
 
   } catch (error) {
@@ -458,6 +525,30 @@ async function verifyBasePayment(txHash, expectedAmount) {
 
     if (receipt.status !== '0x1') {
       return { valid: false, reason: 'Transaction failed' };
+    }
+
+    // Recency check: fetch block timestamp and reject old transactions
+    try {
+      const blockResponse = await fetch(BASE_RPC, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 2,
+          method: 'eth_getBlockByNumber',
+          params: [receipt.blockNumber, false],
+        }),
+      });
+      const { result: block } = await blockResponse.json();
+      if (block?.timestamp) {
+        const blockTimestamp = parseInt(block.timestamp, 16);
+        const txAgeSeconds = Math.floor(Date.now() / 1000) - blockTimestamp;
+        if (txAgeSeconds > TX_MAX_AGE_SECONDS) {
+          return { valid: false, reason: `Transaction too old (${txAgeSeconds}s ago, max ${TX_MAX_AGE_SECONDS}s)` };
+        }
+      }
+    } catch (blockErr) {
+      console.error('Block timestamp fetch error (non-fatal):', blockErr.message);
     }
 
     // Verify it's a USDC transfer to our receiver wallet

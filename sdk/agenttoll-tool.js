@@ -125,7 +125,7 @@ export function parse402Response(response) {
       amount: parseFloat(headers['x-402-amount']),
       currency: headers['x-402-currency'] || 'USDC',
       pay_url: headers['x-402-pay-url'],
-      network: headers['x-402-network'] || 'solana',
+      network: headers['x-402-network'] || null,
     };
   }
 

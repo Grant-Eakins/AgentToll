@@ -63,11 +63,11 @@ function build402(request, apiKey, amount) {
     payment: {
       amount,
       currency: 'USDC',
-      network: 'solana',
+      supported_networks: ['solana', 'base'],
       pay_url: `${TOLL_API_BASE}/pay?publisher=${apiKey}&amount=${amount}&resource=${encodeURIComponent(url.href)}`,
       api_endpoint: `${TOLL_API_BASE}/api/pay`,
     },
-    x402: { version: 1, amount, currency: 'USDC', network: 'solana-mainnet' },
+    x402: { version: 1, amount, currency: 'USDC', supported_networks: ['solana', 'base'] },
     retry: { method: request.method, url: url.href, headers: { 'Authorization': 'Bearer <token>' } },
   };
 }

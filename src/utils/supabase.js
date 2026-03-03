@@ -276,6 +276,53 @@ export async function getAccesses(publisherKey = null, since = null) {
 }
 
 // ==========================================
+// USED TRANSACTIONS (REPLAY PROTECTION)
+// ==========================================
+
+/**
+ * Check if a transaction signature has already been redeemed
+ */
+export async function isTransactionUsed(txSignature) {
+  if (!supabase) return false;
+  
+  const { data, error } = await supabase
+    .from('used_transactions')
+    .select('tx_signature')
+    .eq('tx_signature', txSignature)
+    .single();
+
+  if (error && error.code !== 'PGRST116') {
+    console.error('Supabase isTransactionUsed error:', error);
+  }
+  return !!data;
+}
+
+/**
+ * Mark a transaction signature as used
+ */
+export async function markTransactionUsed(txSignature, { network, publisherKey, amount } = {}) {
+  if (!supabase) return null;
+  
+  const { data, error } = await supabase
+    .from('used_transactions')
+    .insert({
+      tx_signature: txSignature,
+      network: network || 'solana',
+      publisher_key: publisherKey || null,
+      amount: amount || null,
+      redeemed_at: new Date().toISOString(),
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Supabase markTransactionUsed error:', error);
+    return null;
+  }
+  return data;
+}
+
+// ==========================================
 // AGENT STOPS OPERATIONS
 // ==========================================
 

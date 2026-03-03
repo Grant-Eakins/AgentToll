@@ -103,14 +103,17 @@ function build402Response(req, options) {
   const requestedUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
   const isX402Capable = req.headers['x-402-capable'] === 'true';
   
+  const network = options.network; // publisher must specify 'solana' or 'base'
+
   const paymentInfo = {
     status: 402,
     message: 'Payment Required',
-    agent_instructions: `To access this resource, pay ${amount} USDC via the payment URL below. After payment, retry with the returned token in Authorization header.`,
+    agent_instructions: `To access this resource, pay ${amount} USDC on ${network || 'solana or base'} via the payment URL below. After payment, retry with the returned token in Authorization header.`,
     payment: {
       amount: amount,
       currency: 'USDC',
-      network: 'solana',
+      supported_networks: ['solana', 'base'],
+      ...(network ? { network } : {}),
       pay_url: `${TOLL_API_BASE}/pay?publisher=${apiKey}&amount=${amount}&resource=${encodeURIComponent(requestedUrl)}`,
       api_endpoint: `${TOLL_API_BASE}/api/pay`,
     },
@@ -119,7 +122,8 @@ function build402Response(req, options) {
       amount: amount,
       currency: 'USDC',
       receiver: options.walletAddress || 'pending',
-      network: 'solana-mainnet',
+      supported_networks: ['solana', 'base'],
+      ...(network ? { network: network === 'base' ? 'base-mainnet' : 'solana-mainnet' } : {}),
       description: `Access to ${resource || requestedUrl}`,
     },
     retry: {
@@ -267,7 +271,8 @@ function tollbooth(apiKey, options = {}) {
     res.setHeader('X-402-Amount', config.amount.toString());
     res.setHeader('X-402-Currency', 'USDC');
     res.setHeader('X-402-Pay-URL', paymentInfo.payment.pay_url);
-    res.setHeader('X-402-Network', 'solana');
+    if (network) res.setHeader('X-402-Network', network);
+    res.setHeader('X-402-Supported-Networks', 'solana,base');
     res.setHeader('Content-Type', 'application/json');
     
     // Add onboarding hint for non-capable agents

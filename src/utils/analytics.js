@@ -14,8 +14,12 @@ import {
   countPublishers as dbCountPublishers,
   insertAgentStop as dbInsertAgentStop,
   getAgentStopCount as dbGetAgentStopCount,
-  getAgentStops as dbGetAgentStops
+  getAgentStops as dbGetAgentStops,
+  isTransactionUsed as dbIsTransactionUsed,
+  markTransactionUsed as dbMarkTransactionUsed
 } from './supabase.js';
+
+export { isSupabaseConfigured, dbIsTransactionUsed, dbMarkTransactionUsed };
 
 // Import publishers store for fallback
 import { publishers, getPublisherCount } from '../routes/publisher.js';
