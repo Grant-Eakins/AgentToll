@@ -10,7 +10,7 @@ import { tollgate } from '@agenttoll/sdk/edge';
 // ONE LINE - Wraps your entire worker
 // ============================================
 export default tollgate('pk_live_your_api_key', {
-  amount: 0.005,
+  amount: 0.05,
   freeForHumans: true, // Humans browse free, AgentToll pays
   
   handler: async (request) => {

@@ -81,7 +81,7 @@ function build402(request, apiKey, amount) {
  * import { tollgate } from '@agenttoll/sdk/edge'
  * 
  * export default tollgate('pk_live_xxx', {
- *   amount: 0.005,
+ *   amount: 0.05,
  *   freeForHumans: true,
  *   handler: async (request) => {
  *     return new Response('Premium content!')
@@ -89,7 +89,8 @@ function build402(request, apiKey, amount) {
  * })
  */
 export function tollgate(apiKey, options = {}) {
-  const amount = options.amount || 0.005;
+  const MINIMUM_AMOUNT = 0.05;
+  const amount = Math.max(options.amount || 0.05, MINIMUM_AMOUNT);
   const freeForHumans = options.freeForHumans ?? false;
   const handler = options.handler;
 
@@ -134,7 +135,8 @@ export function tollgate(apiKey, options = {}) {
  * Middleware for edge frameworks (Hono, itty-router, etc.)
  */
 export function tollMiddleware(apiKey, options = {}) {
-  const amount = options.amount || 0.005;
+  const MINIMUM_AMOUNT = 0.05;
+  const amount = Math.max(options.amount || 0.05, MINIMUM_AMOUNT);
   const freeForHumans = options.freeForHumans ?? false;
 
   return async (request, next) => {

@@ -81,16 +81,13 @@ router.post('/register', async (req, res) => {
     secret_key: secretKey,
     created_at: Date.now(),
     settings: {
-      default_amount: 0.005,
+      default_amount: 0.05,
       free_for_humans: false,
       paths: ['*'],
-      custom_fee_percent: null, // null = use platform default, or set 0-15 for custom
       // Access control mode
       access_mode: 'session', // 'per-request', 'session', 'pass'
       access_duration: '1h',  // Duration for session/pass modes
     },
-    // Tier (affects fees)
-    tier: 'standard', // 'standard' (5%), 'premium' (3%), 'enterprise' (custom)
     // Revenue tracking
     revenue: {
       total_gross: 0,
@@ -155,9 +152,18 @@ router.patch('/settings', async (req, res) => {
     return res.status(404).json({ error: 'Publisher not found' });
   }
 
-  const { default_amount, free_for_humans, paths, wallet_address, wallets, custom_fee_percent, access_mode, access_duration } = req.body;
+  const { default_amount, free_for_humans, paths, wallet_address, wallets, access_mode, access_duration } = req.body;
 
-  if (default_amount !== undefined) publisher.settings.default_amount = default_amount;
+  if (default_amount !== undefined) {
+    if (default_amount < 0.05) {
+      return res.status(400).json({
+        error: 'Minimum amount is 0.05 USDC',
+        minimum: 0.05,
+        provided: default_amount,
+      });
+    }
+    publisher.settings.default_amount = default_amount;
+  }
   if (free_for_humans !== undefined) publisher.settings.free_for_humans = free_for_humans;
   if (paths !== undefined) publisher.settings.paths = paths;
   
@@ -186,20 +192,6 @@ router.patch('/settings', async (req, res) => {
     publisher.settings.access_duration = access_duration;
   }
   
-  // Custom fee requires enterprise tier or platform approval
-  if (custom_fee_percent !== undefined) {
-    if (publisher.tier !== 'enterprise') {
-      return res.status(403).json({ 
-        error: 'Custom fees require enterprise tier',
-        current_tier: publisher.tier,
-        hint: 'Contact @0xgrante on X for enterprise pricing',
-      });
-    }
-    if (custom_fee_percent < 0 || custom_fee_percent > 15) {
-      return res.status(400).json({ error: 'Fee must be between 0-15%' });
-    }
-    publisher.settings.custom_fee_percent = custom_fee_percent;
-  }
   if (wallet_address !== undefined) {
     publisher.wallet_address = wallet_address;
     publisher.wallets.solana = wallet_address;
@@ -231,32 +223,19 @@ router.get('/revenue', async (req, res) => {
 
   const defaultFeePercent = parseFloat(process.env.PLATFORM_FEE_PERCENT || '5');
   
-  // Calculate effective fee based on tier
-  let effectiveFeePercent;
-  if (publisher.settings.custom_fee_percent !== null && publisher.settings.custom_fee_percent !== undefined) {
-    effectiveFeePercent = publisher.settings.custom_fee_percent;
-  } else if (publisher.tier === 'premium') {
-    effectiveFeePercent = 3;
-  } else if (publisher.tier === 'enterprise') {
-    effectiveFeePercent = 1;
-  } else {
-    effectiveFeePercent = defaultFeePercent;
-  }
+  // Flat 5% fee for all publishers
+  const effectiveFeePercent = defaultFeePercent;
 
   res.json({
     publisher_id: publisher.id,
     publisher_name: publisher.name,
-    tier: publisher.tier,
     wallets: publisher.wallets,
     fees: {
-      effective_fee_percent: effectiveFeePercent,
-      default_fee_percent: defaultFeePercent,
-      custom_fee_percent: publisher.settings.custom_fee_percent,
-      tier_discount: publisher.tier !== 'standard' ? `${publisher.tier} tier` : null,
+      fee_percent: effectiveFeePercent,
     },
     revenue: publisher.revenue,
     payment_flow: 'direct',
-    note: 'Payments are sent directly to your wallet. Platform fee is deducted at payment time.',
+    note: 'Payments are sent directly to your wallet. A flat 5% platform fee is deducted at payment time.',
   });
 });
 

@@ -56,7 +56,7 @@ Example agent flow:
    {
      "status": 402,
      "payment": {
-       "amount": 0.005,
+     "amount": 0.05,
        "currency": "USDC",
        "pay_url": "https://toll.agenttoll.io/pay?..."
      }
@@ -67,7 +67,7 @@ Example agent flow:
 4. Agent calls pay_toll:
    pay_toll({
      url: "https://api.example.com/research-data",
-     amount: 0.005,
+     amount: 0.05,
      reason: "Contains academic papers relevant to quantum computing research"
    })
 

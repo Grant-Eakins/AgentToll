@@ -128,7 +128,7 @@ app.get('/pay', (req, res) => {
       <div class="card">
         <h1>🚧 Toll Payment Required</h1>
         <p>Access to this resource requires a micropayment:</p>
-        <p class="amount">${amount || '0.005'} USDC</p>
+        <p class="amount">${amount || '0.05'} USDC</p>
         <p>Resource: <code>${resource || 'N/A'}</code></p>
         <button class="btn" onclick="initPayment()">Pay with Solana</button>
         
@@ -137,7 +137,7 @@ app.get('/pay', (req, res) => {
           <p>POST to <code>/api/pay</code> with your signed transaction:</p>
           <pre>{
   "publisher": "${publisher}",
-  "amount": ${amount || 0.005},
+  "amount": ${amount || 0.05},
   "resource": "${resource}",
   "tx_signature": "your_solana_tx_sig"
 }</pre>

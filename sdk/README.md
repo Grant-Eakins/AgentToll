@@ -35,7 +35,7 @@ import tollbooth from '@agenttoll/sdk';
 
 // Toll all agents, let humans through free
 app.use(tollbooth(process.env.AGENTTOLL_KEY, {
-  amount: 0.005,        // USDC per request
+  amount: 0.05,         // USDC per request
   freeForHumans: true   // Browsers pass free
 }));
 
@@ -47,7 +47,7 @@ app.use(tollbooth.agentsOnly(process.env.AGENTTOLL_KEY));
 
 ```javascript
 tollbooth(apiKey, {
-  amount: 0.005,           // USDC to charge (default: 0.005)
+  amount: 0.05,            // USDC to charge (default: 0.05)
   freeForHumans: false,    // Let browsers through free
   paths: ['*'],            // Routes to toll (glob patterns)
   walletAddress: null,     // Override default wallet

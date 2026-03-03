@@ -7,7 +7,7 @@
  * 
  * Usage (Cloudflare Worker):
  *   import { tollgate } from '@agenttoll/sdk/edge'
- *   export default tollgate('your-api-key', { amount: 0.005 })
+ *   export default tollgate('your-api-key', { amount: 0.05 })
  */
 
 const TOLL_API_BASE = process.env.TOLL_API_URL || 'https://agenttoll-production.up.railway.app';
@@ -194,8 +194,9 @@ function build402Response(req, options) {
  * }));
  */
 function tollbooth(apiKey, options = {}) {
+  const MINIMUM_AMOUNT = 0.05;
   const config = {
-    amount: options.amount || 0.005,
+    amount: Math.max(options.amount || 0.05, MINIMUM_AMOUNT),
     paths: options.paths || ['*'],
     freeForHumans: options.freeForHumans ?? false,
     walletAddress: options.walletAddress || null,

@@ -623,7 +623,7 @@ app.get('/api/premium/data', (req, res) => {
               <pre>// Publisher config
 {
   "access_mode": "per-request",
-  "default_amount": 0.001  // $0.001 per query
+  "default_amount": 0.05  // $0.05 minimum per query
 }
 
 // Agent pays → gets token → uses once → must pay again</pre>
@@ -645,7 +645,7 @@ app.get('/api/premium/data', (req, res) => {
 {
   "access_mode": "session",
   "access_duration": "1h",
-  "default_amount": 0.01  // $0.01 for 1 hour
+  "default_amount": 0.05  // $0.05 minimum for 1 hour
 }
 
 // Agent can access same endpoint unlimited times for 1 hour</pre>
@@ -666,7 +666,7 @@ app.get('/api/premium/data', (req, res) => {
 {
   "access_mode": "pass",
   "access_duration": "24h",
-  "default_amount": 0.50  // $0.50 for 24h full access
+  "default_amount": 0.50  // $0.50 for 24h full access (min $0.05)
 }
 
 // Agent gets full site access to any endpoint</pre>
@@ -676,6 +676,7 @@ app.get('/api/premium/data', (req, res) => {
 
         <div class="warning-callout">
           <h4>⚠️ Choosing the Right Mode</h4>
+          <p><strong>Minimum charge: $0.05 USDC</strong> regardless of mode.</p>
           <ul>
             <li><strong>per-request</strong> — Maximum protection, higher friction</li>
             <li><strong>session</strong> — Balanced, good for most APIs</li>
@@ -753,9 +754,9 @@ app.get('/api/premium/data', (req, res) => {
           <pre>{
   "status": 402,
   "message": "Payment Required",
-  "agent_instructions": "Pay 0.005 USDC to access...",
+  "agent_instructions": "Pay 0.05 USDC to access...",
   "payment": {
-    "amount": 0.005,
+    "amount": 0.05,
     "currency": "USDC",
     "network": "solana",
     "receiver_wallet": "ABC123...",
@@ -775,7 +776,7 @@ app.get('/api/premium/data', (req, res) => {
         <p><strong>Headers included:</strong></p>
         <div class="code-block">
           <pre>X-402-Version: 1
-X-402-Amount: 0.005
+X-402-Amount: 0.05
 X-402-Currency: USDC
 X-402-Pay-URL: https://agenttoll-production.up.railway.app/pay?...</pre>
         </div>
@@ -1031,7 +1032,7 @@ app.use('/api/premium', tollbooth(process.env.AGENTTOLL_KEY, {
 
 // Free for humans, toll for agents
 app.use('/api/data', tollbooth(process.env.AGENTTOLL_KEY, {
-  amount: 0.005,
+  amount: 0.05,
   freeForHumans: true
 }));
 
@@ -1086,7 +1087,7 @@ export default {
           <tr>
             <td><code>amount</code></td>
             <td>number</td>
-            <td>0.005</td>
+            <td>0.05</td>
             <td>USDC amount to charge per request/session</td>
           </tr>
           <tr>

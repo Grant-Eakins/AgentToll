@@ -16,6 +16,7 @@ const BASE_USDC_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'; // USDC 
 
 // Platform fee configuration
 const DEFAULT_FEE_PERCENT = parseFloat(process.env.PLATFORM_FEE_PERCENT || '5'); // 5% default
+const MINIMUM_AMOUNT = 0.05; // Minimum charge: $0.05 USDC
 const PLATFORM_SOLANA_WALLET = process.env.PLATFORM_SOLANA_WALLET;
 const PLATFORM_BASE_WALLET = process.env.PLATFORM_BASE_WALLET;
 
@@ -35,23 +36,10 @@ if (!hasSolanaWallet && !hasBaseWallet) {
 }
 
 /**
- * Calculate effective fee percent for a publisher based on tier and custom settings
+ * Platform fee is a flat 5% for all publishers
  */
-function getEffectiveFeePercent(publisherData) {
-  if (!publisherData) return DEFAULT_FEE_PERCENT;
-  
-  // Custom fee takes priority (enterprise tier)
-  if (publisherData.settings?.custom_fee_percent !== null && 
-      publisherData.settings?.custom_fee_percent !== undefined) {
-    return publisherData.settings.custom_fee_percent;
-  }
-  
-  // Tier-based discounts
-  switch (publisherData.tier) {
-    case 'premium': return 3;
-    case 'enterprise': return 1;
-    default: return DEFAULT_FEE_PERCENT;
-  }
+function getEffectiveFeePercent() {
+  return DEFAULT_FEE_PERCENT; // 5% flat for everyone
 }
 
 /**
@@ -82,6 +70,16 @@ router.post('/', async (req, res) => {
       });
     }
 
+    // Enforce minimum amount
+    if (amount && parseFloat(amount) < MINIMUM_AMOUNT) {
+      return res.status(400).json({
+        error: `Minimum payment is ${MINIMUM_AMOUNT} USDC`,
+        minimum_amount: MINIMUM_AMOUNT,
+        provided: parseFloat(amount),
+        agent_hint: `Amount must be at least ${MINIMUM_AMOUNT} USDC`,
+      });
+    }
+
     // Verify the payment based on network
     let verification;
     if (network === 'base') {
@@ -99,9 +97,9 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Look up publisher and calculate fees based on their tier
+    // Look up publisher and calculate fees (flat 5%)
     const publisherData = await getPublisher(publisher);
-    const feePercent = getEffectiveFeePercent(publisherData);
+    const feePercent = getEffectiveFeePercent();
     const platformFee = amount * (feePercent / 100);
     const publisherReceives = amount - platformFee;
 
@@ -202,8 +200,8 @@ router.get('/quote', async (req, res) => {
     });
   }
 
-  const amount = parseFloat(req.query.amount) || publisherData.settings?.default_amount || 0.005;
-  const feePercent = getEffectiveFeePercent(publisherData);
+  const amount = Math.max(parseFloat(req.query.amount) || publisherData.settings?.default_amount || 0.05, MINIMUM_AMOUNT);
+  const feePercent = getEffectiveFeePercent();
   const platformFee = amount * (feePercent / 100);
   const publisherReceives = amount - platformFee;
 
@@ -235,7 +233,6 @@ router.get('/quote', async (req, res) => {
     publisher: {
       name: publisherData.name,
       id: publisherData.id,
-      tier: publisherData.tier,
     },
   };
 
@@ -329,8 +326,8 @@ router.post('/intent', async (req, res) => {
     return res.status(404).json({ error: 'Publisher not found' });
   }
 
-  const paymentAmount = parseFloat(amount) || publisherData.settings?.default_amount || 0.005;
-  const feePercent = getEffectiveFeePercent(publisherData);
+  const paymentAmount = Math.max(parseFloat(amount) || publisherData.settings?.default_amount || 0.05, MINIMUM_AMOUNT);
+  const feePercent = getEffectiveFeePercent();
   const platformFee = paymentAmount * (feePercent / 100);
   const publisherReceives = paymentAmount - platformFee;
 

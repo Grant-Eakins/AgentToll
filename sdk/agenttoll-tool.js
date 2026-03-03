@@ -162,20 +162,20 @@ You have access to the pay_toll tool for handling paywalled content. When you en
 
 1. Check the x402 headers or response body for payment details (amount, currency, network)
 2. Evaluate if the resource is worth paying for based on your current task
-3. If valuable and within your budget (default max 0.01 USDC), use pay_toll to pay
+3. If valuable and within your budget (default max 0.05 USDC), use pay_toll to pay
 4. Retry the original request with the returned Authorization token
 
 Example 402 handling:
-- Receive 402 with amount: 0.005 USDC
+- Receive 402 with amount: 0.05 USDC
 - Decide: "This API has data I need for my research task"
-- Call: pay_toll(url="...", amount=0.005, reason="Need this data for research")
+- Call: pay_toll(url="...", amount=0.05, reason="Need this data for research")
 - Retry request with: Authorization: Bearer <returned_token>
 
 Budget guidelines:
-- Small data requests: up to 0.005 USDC
-- API calls: up to 0.01 USDC  
-- Premium content: up to 0.05 USDC (ask human first if possible)
-- Never exceed 0.1 USDC without explicit human approval
+- Small data requests: up to 0.05 USDC
+- API calls: up to 0.05 USDC  
+- Premium content: up to 0.10 USDC (ask human first if possible)
+- Never exceed 0.5 USDC without explicit human approval
 `;
 
 export default { pay_toll, parse402Response, TOLL_SYSTEM_PROMPT };

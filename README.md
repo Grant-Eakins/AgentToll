@@ -113,16 +113,16 @@ When an agent hits a tolled resource without payment:
 {
   "status": 402,
   "message": "Payment Required",
-  "agent_instructions": "Pay 0.005 USDC via the payment URL below...",
+  "agent_instructions": "Pay 0.05 USDC via the payment URL below...",
   "payment": {
-    "amount": 0.005,
+    "amount": 0.05,
     "currency": "USDC",
     "network": "solana",
     "pay_url": "https://toll.agenttoll.io/pay?..."
   },
   "x402": {
     "version": 1,
-    "amount": 0.005,
+    "amount": 0.05,
     "currency": "USDC",
     "network": "solana-mainnet"
   },
@@ -138,7 +138,7 @@ When an agent hits a tolled resource without payment:
 Plus HTTP headers:
 ```
 X-402-Version: 1
-X-402-Amount: 0.005
+X-402-Amount: 0.05
 X-402-Currency: USDC
 X-402-Pay-URL: https://toll.agenttoll.io/pay?...
 ```

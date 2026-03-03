@@ -462,7 +462,7 @@ async function submitRegistration(e) {
     document.getElementById('result-api-key').textContent = data.api_key;
     document.getElementById('result-secret-key').textContent = data.secret_key;
     document.getElementById('result-integration').textContent = 
-      `npm install @agenttoll/sdk\n\n// In your server.js\nimport tollbooth from '@agenttoll/sdk';\n\napp.use(tollbooth('${data.api_key}', {\n  amount: 0.005,       // USDC per request\n  freeForHumans: true  // Let browsers through free\n}));`;
+      `npm install @agenttoll/sdk\n\n// In your server.js\nimport tollbooth from '@agenttoll/sdk';\n\napp.use(tollbooth('${data.api_key}', {\n  amount: 0.05,        // USDC per request\n  freeForHumans: true  // Let browsers through free\n}));`;
     
   } catch (err) {
     errorDiv.textContent = err.message;

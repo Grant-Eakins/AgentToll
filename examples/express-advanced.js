@@ -20,7 +20,7 @@ app.use(tollbooth('pk_live_xxx', {
 // OPTION 2: Free for humans, toll for agents
 // ============================================
 app.use('/api/research', tollbooth.agentsOnly('pk_live_xxx', {
-  amount: 0.005,
+  amount: 0.05,
 }));
 
 // ============================================
@@ -59,7 +59,7 @@ app.get('/api/smart',
 // OPTION 5: With webhook on payment
 // ============================================
 app.use('/api/tracked', tollbooth('pk_live_xxx', {
-  amount: 0.005,
+  amount: 0.05,
   onPayment: (paymentInfo) => {
     console.log(`Payment received: ${paymentInfo.amount} from ${paymentInfo.agent}`);
     // Log to your analytics, send notification, etc.

@@ -120,14 +120,14 @@ function getApiDocs() {
             network: { type: 'string', default: 'solana', enum: ['solana', 'base'] },
           },
           response: {
-            amount: 0.005,
+            amount: 0.05,
             currency: 'USDC',
             network: 'solana',
             receiver_wallet: 'ABC123...',
             fee_breakdown: {
-              total: 0.005,
-              publisher_receives: 0.00475,
-              platform_fee: 0.00025,
+              total: 0.05,
+              publisher_receives: 0.0475,
+              platform_fee: 0.0025,
               platform_fee_percent: 5,
             },
             access: {
@@ -333,17 +333,17 @@ function getApiDocs() {
       example: {
         status: 402,
         message: 'Payment Required',
-        agent_instructions: 'Pay 0.005 USDC via the payment URL below...',
+        agent_instructions: 'Pay 0.05 USDC via the payment URL below...',
         payment: {
-          amount: 0.005,
+          amount: 0.05,
           currency: 'USDC',
           network: 'solana',
-          pay_url: 'https://toll.agenttoll.io/pay?publisher=pk_xxx&amount=0.005&resource=...',
+          pay_url: 'https://toll.agenttoll.io/pay?publisher=pk_xxx&amount=0.05&resource=...',
           api_endpoint: 'https://toll.agenttoll.io/api/pay',
         },
         x402: {
           version: 1,
-          amount: 0.005,
+          amount: 0.05,
           currency: 'USDC',
           network: 'solana-mainnet',
         },
@@ -354,7 +354,7 @@ function getApiDocs() {
       },
       headers: {
         'X-402-Version': '1',
-        'X-402-Amount': '0.005',
+        'X-402-Amount': '0.05',
         'X-402-Currency': 'USDC',
         'X-402-Pay-URL': 'https://toll.agenttoll.io/pay?...',
       },
@@ -380,7 +380,7 @@ function getApiDocs() {
   paths: ['/api/premium/*'],
   freeForHumans: true 
 }))`,
-      cloudflare: "export default tollgate('pk_live_xxx', { amount: 0.005 })",
+      cloudflare: "export default tollgate('pk_live_xxx', { amount: 0.05 })",
       nextjs: "const toll = tollMiddleware('pk_live_xxx')",
     },
 
@@ -389,7 +389,7 @@ function getApiDocs() {
       400: 'Bad Request - Missing or invalid parameters',
       401: 'Unauthorized - Invalid or missing API key',
       402: 'Payment Required - Toll not paid',
-      403: 'Forbidden - Action not allowed (e.g., custom fees without enterprise tier)',
+      403: 'Forbidden - Action not allowed',
       404: 'Not Found - Publisher or resource not found',
       500: 'Internal Error - Server-side issue, retry later',
     },

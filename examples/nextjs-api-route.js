@@ -7,7 +7,7 @@
 import { tollMiddleware } from '@agenttoll/sdk/edge';
 
 const toll = tollMiddleware('pk_live_xxx', {
-  amount: 0.005,
+  amount: 0.05,
   freeForHumans: true,
 });
 
