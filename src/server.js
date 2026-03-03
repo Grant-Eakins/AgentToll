@@ -105,6 +105,10 @@ app.get('/docs', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/docs.html'));
 });
 
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/dashboard.html'));
+});
+
 // Human-readable payment page (dynamic - needs query params)
 app.get('/pay', (req, res) => {
   const { publisher, amount, resource } = req.query;

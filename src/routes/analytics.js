@@ -148,6 +148,33 @@ router.post('/agent-stopped', async (req, res) => {
 });
 
 /**
+ * GET /api/analytics/agents-stopped/details
+ * Get recent agent stops with full details for dashboard
+ */
+router.get('/agents-stopped/details', async (req, res) => {
+  const publisherKey = req.headers['x-publisher-key'];
+  
+  if (!publisherKey) {
+    return res.status(401).json({ error: 'Publisher key required' });
+  }
+
+  const timeframe = req.query.timeframe || '24h';
+  const since = Date.now() - parseTimeframe(timeframe);
+  const stops = await getAgentStopsData(publisherKey, since);
+
+  // Sort most recent first, limit to 50
+  const sorted = stops
+    .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+    .slice(0, 50);
+
+  res.json({
+    timeframe,
+    count: sorted.length,
+    stops: sorted,
+  });
+});
+
+/**
  * GET /api/analytics/agents-stopped
  * Get total agents stopped count
  */

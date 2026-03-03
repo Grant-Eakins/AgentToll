@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <title>Dashboard — AgentToll</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="icon" href="/logo.png">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="logo">
+        <img src="/logo.png" alt="" class="logo-icon-img">
+        <img src="/Copilot_20260217_123447.png" alt="AgentToll" class="logo-text-img">
+      </a>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/docs">Docs</a>
+        <a href="/dashboard" class="active">Dashboard</a>
+      </div>
+      <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+    </div>
+  </nav>
+
+  <!-- Login Screen -->
+  <div id="dash-login" class="dash-login">
+    <div class="dash-login-card">
+      <h1>Publisher Dashboard</h1>
+      <p class="dash-login-subtitle">Enter your API key to access your dashboard.</p>
+      <form id="login-form" onsubmit="dashboardLogin(event)">
+        <div class="form-group">
+          <label for="api-key-input">API Key</label>
+          <input type="text" id="api-key-input" placeholder="pk_live_..." required autocomplete="off">
+        </div>
+        <div id="login-error" class="form-error" style="display: none;"></div>
+        <button type="submit" class="btn btn-primary btn-full" id="login-btn">
+          <span id="login-btn-text">Open Dashboard</span>
+        </button>
+      </form>
+      <p class="dash-login-hint">Don't have an API key? <a href="/" onclick="return false;" id="get-key-link">Get one here</a></p>
+    </div>
+  </div>
+
+  <!-- Dashboard Content (hidden until login) -->
+  <div id="dash-content" class="dash-content" style="display: none;">
+    
+    <!-- Dashboard Header -->
+    <div class="dash-header">
+      <div class="dash-header-left">
+        <h1 id="dash-project-name">Dashboard</h1>
+        <span class="dash-api-key-badge" id="dash-api-key-badge"></span>
+      </div>
+      <div class="dash-header-right">
+        <select id="dash-timeframe" class="dash-select" onchange="refreshDashboard()">
+          <option value="1h">Last hour</option>
+          <option value="24h" selected>Last 24h</option>
+          <option value="7d">Last 7 days</option>
+          <option value="30d">Last 30 days</option>
+        </select>
+        <button class="btn btn-ghost dash-refresh-btn" onclick="refreshDashboard()" title="Refresh">↻</button>
+        <button class="btn btn-ghost" onclick="dashboardLogout()">Log out</button>
+      </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="dash-stats-grid">
+      <div class="dash-stat-card">
+        <div class="dash-stat-icon dash-stat-icon-red">🚧</div>
+        <div class="dash-stat-info">
+          <span class="dash-stat-value" id="dash-agents-blocked">0</span>
+          <span class="dash-stat-label">Agents Blocked</span>
+        </div>
+      </div>
+      <div class="dash-stat-card">
+        <div class="dash-stat-icon dash-stat-icon-green">💰</div>
+        <div class="dash-stat-info">
+          <span class="dash-stat-value" id="dash-total-revenue">$0.00</span>
+          <span class="dash-stat-label">Revenue (gross)</span>
+        </div>
+      </div>
+      <div class="dash-stat-card">
+        <div class="dash-stat-icon dash-stat-icon-blue">💸</div>
+        <div class="dash-stat-info">
+          <span class="dash-stat-value" id="dash-net-revenue">$0.00</span>
+          <span class="dash-stat-label">Revenue (net)</span>
+        </div>
+      </div>
+      <div class="dash-stat-card">
+        <div class="dash-stat-icon dash-stat-icon-purple">🤖</div>
+        <div class="dash-stat-info">
+          <span class="dash-stat-value" id="dash-unique-agents">0</span>
+          <span class="dash-stat-label">Unique Agents</span>
+        </div>
+      </div>
+      <div class="dash-stat-card">
+        <div class="dash-stat-icon dash-stat-icon-yellow">📊</div>
+        <div class="dash-stat-info">
+          <span class="dash-stat-value" id="dash-total-payments">0</span>
+          <span class="dash-stat-label">Total Payments</span>
+        </div>
+      </div>
+      <div class="dash-stat-card">
+        <div class="dash-stat-icon dash-stat-icon-teal">🔓</div>
+        <div class="dash-stat-info">
+          <span class="dash-stat-value" id="dash-total-accesses">0</span>
+          <span class="dash-stat-label">Access Grants</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two Column Layout -->
+    <div class="dash-grid-2col">
+
+      <!-- Wallet Info Card -->
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <h2>Connected Wallets</h2>
+          <span class="dash-badge dash-badge-green" id="wallet-status">Active</span>
+        </div>
+        <div class="dash-card-body">
+          <div class="dash-wallet-list">
+            <div class="dash-wallet" id="wallet-solana-row">
+              <div class="dash-wallet-icon">◎</div>
+              <div class="dash-wallet-info">
+                <span class="dash-wallet-network">Solana</span>
+                <span class="dash-wallet-address" id="wallet-solana-addr">—</span>
+              </div>
+              <span class="dash-wallet-status" id="wallet-solana-status"></span>
+            </div>
+            <div class="dash-wallet" id="wallet-base-row">
+              <div class="dash-wallet-icon">⬡</div>
+              <div class="dash-wallet-info">
+                <span class="dash-wallet-network">Base</span>
+                <span class="dash-wallet-address" id="wallet-base-addr">—</span>
+              </div>
+              <span class="dash-wallet-status" id="wallet-base-status"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Publisher Info Card -->
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <h2>Account Info</h2>
+        </div>
+        <div class="dash-card-body">
+          <div class="dash-info-list">
+            <div class="dash-info-row">
+              <span class="dash-info-label">Project</span>
+              <span class="dash-info-value" id="info-project">—</span>
+            </div>
+            <div class="dash-info-row">
+              <span class="dash-info-label">Email</span>
+              <span class="dash-info-value" id="info-email">—</span>
+            </div>
+            <div class="dash-info-row">
+              <span class="dash-info-label">Website</span>
+              <span class="dash-info-value" id="info-website">—</span>
+            </div>
+            <div class="dash-info-row">
+              <span class="dash-info-label">Access Mode</span>
+              <span class="dash-info-value" id="info-access-mode">—</span>
+            </div>
+            <div class="dash-info-row">
+              <span class="dash-info-label">Default Amount</span>
+              <span class="dash-info-value" id="info-default-amount">—</span>
+            </div>
+            <div class="dash-info-row">
+              <span class="dash-info-label">Platform Fee</span>
+              <span class="dash-info-value" id="info-fee">5%</span>
+            </div>
+            <div class="dash-info-row">
+              <span class="dash-info-label">Free for Humans</span>
+              <span class="dash-info-value" id="info-free-humans">—</span>
+            </div>
+            <div class="dash-info-row">
+              <span class="dash-info-label">Created</span>
+              <span class="dash-info-value" id="info-created">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agent Breakdown + Blocked Agents -->
+    <div class="dash-grid-2col">
+
+      <!-- Agent Type Breakdown -->
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <h2>Agent Breakdown</h2>
+        </div>
+        <div class="dash-card-body">
+          <div id="agent-breakdown-list" class="dash-breakdown-list">
+            <div class="dash-empty-state">No agent data yet</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Blocked Agents -->
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <h2>Recently Blocked</h2>
+          <span class="dash-badge dash-badge-red" id="blocked-live-badge">
+            <span class="live-dot-small"></span> Live
+          </span>
+        </div>
+        <div class="dash-card-body">
+          <div id="blocked-agents-list" class="dash-blocked-list">
+            <div class="dash-empty-state">No blocked agents recorded</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Resources -->
+    <div class="dash-card">
+      <div class="dash-card-header">
+        <h2>Top Resources</h2>
+      </div>
+      <div class="dash-card-body">
+        <div id="top-resources-list" class="dash-resources-list">
+          <div class="dash-empty-state">No resource data yet</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Revenue Breakdown -->
+    <div class="dash-card">
+      <div class="dash-card-header">
+        <h2>Revenue Breakdown</h2>
+      </div>
+      <div class="dash-card-body">
+        <div class="dash-revenue-summary" id="revenue-summary">
+          <div class="dash-revenue-bar">
+            <div class="dash-revenue-bar-fill" id="revenue-bar-fill" style="width: 0%"></div>
+          </div>
+          <div class="dash-revenue-details">
+            <div class="dash-revenue-item">
+              <span class="dash-revenue-dot dash-dot-green"></span>
+              <span>Publisher earnings</span>
+              <strong id="revenue-publisher">$0.00</strong>
+            </div>
+            <div class="dash-revenue-item">
+              <span class="dash-revenue-dot dash-dot-red"></span>
+              <span>Platform fee (5%)</span>
+              <strong id="revenue-platform-fee">$0.00</strong>
+            </div>
+          </div>
+        </div>
+        <div id="revenue-daily" class="dash-daily-chart">
+          <div class="dash-empty-state">No daily revenue data</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>
