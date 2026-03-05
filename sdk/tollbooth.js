@@ -338,7 +338,6 @@ function tollbooth(apiKey, options = {}) {
     res.setHeader('X-402-Amount', config.amount.toString());
     res.setHeader('X-402-Currency', 'USDC');
     res.setHeader('X-402-Pay-URL', paymentInfo.payment.pay_url);
-    if (network) res.setHeader('X-402-Network', network);
     res.setHeader('X-402-Supported-Networks', 'solana,base');
     res.setHeader('Content-Type', 'application/json');
     
