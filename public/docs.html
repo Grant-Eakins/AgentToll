@@ -495,6 +495,12 @@
       <a href="#payment-endpoints">Payment</a>
       <a href="#verify-endpoints">Verification</a>
       <a href="/api/docs" target="_blank">Full API →</a>
+
+      <h4>Protection Layers</h4>
+      <a href="#content-gate">Content Gate</a>
+      <a href="#mcp-proxy">MCP Proxy</a>
+      <a href="#browser-gate">Browser Gate</a>
+      <a href="#robots-txt">robots.txt</a>
     </aside>
 
     <!-- Main Content -->
@@ -1178,6 +1184,244 @@ tollbooth.isAgent(req)  // returns boolean</pre>
               </tr>
             </table>
           </div>
+        </div>
+      </section>
+
+      <!-- Content Gate -->
+      <section id="content-gate">
+        <h2>Content Gate — Protect HTML Pages</h2>
+        <p>
+          While the SDK middleware protects API routes, the <strong>Content Gate</strong> protects your HTML pages 
+          from agentic search crawlers (Perplexity, SearchGPT, Google AI Overviews, etc.) that scrape and summarize 
+          your content without payment.
+        </p>
+
+        <div class="info-callout">
+          <h4>💡 What It Does</h4>
+          <ul>
+            <li>Detects 40+ agentic search crawlers by User-Agent</li>
+            <li>Returns stripped 402 HTML with x402 meta tags for payment discovery</li>
+            <li>Lets real browsers and social preview bots through</li>
+            <li>Generates robots.txt blocking AI crawlers with x402 payment signals</li>
+          </ul>
+        </div>
+
+        <h3>Express Integration</h3>
+        <div class="code-block">
+          <div class="code-header">JavaScript</div>
+          <pre><code>import { contentGate, generateRobotsTxt } from '@agenttoll/sdk/content-gate';
+
+// Gate all HTML routes
+app.use(contentGate(PUBLISHER_KEY, {
+  amount: 0.05,
+  allowPaths: ['/public', '/about'],  // Optional: paths that stay free
+}));
+
+// Auto-generate robots.txt
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain').send(generateRobotsTxt({
+    publisherKey: PUBLISHER_KEY,
+    amount: 0.05,
+  }));
+});</code></pre>
+        </div>
+      </section>
+
+      <!-- MCP Proxy -->
+      <section id="mcp-proxy">
+        <h2>MCP Payment Proxy</h2>
+        <p>
+          Paywall any <strong>Model Context Protocol (MCP)</strong> server without modifying it. 
+          The proxy sits between MCP clients (AI agents) and your MCP server, intercepting tool calls 
+          and requiring payment before forwarding.
+        </p>
+
+        <h3>How It Works</h3>
+        <div class="code-block">
+          <div class="code-header">Flow</div>
+          <pre><code>Agent → MCP Proxy (402 Payment Required) → Agent Pays → MCP Proxy → Your MCP Server → Response</code></pre>
+        </div>
+
+        <h3>Register Your MCP Server</h3>
+        <div class="code-block">
+          <div class="code-header">cURL</div>
+          <pre><code>curl -X POST /api/mcp/register \
+  -H "X-Publisher-Key: YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "upstream_url": "http://localhost:8080/mcp",
+    "name": "My Data Server",
+    "amount": 0.10
+  }'</code></pre>
+        </div>
+
+        <h3>Agent Configuration (Claude Desktop, etc.)</h3>
+        <div class="code-block">
+          <div class="code-header">JSON</div>
+          <pre><code>{
+  "mcpServers": {
+    "my-server": {
+      "url": "https://agenttoll-production.up.railway.app/api/mcp/proxy",
+      "headers": {
+        "X-Publisher-Key": "YOUR_KEY",
+        "X-MCP-Upstream": "http://your-server.com/mcp"
+      }
+    }
+  }
+}</code></pre>
+        </div>
+
+        <h3>Free vs Paid Methods</h3>
+        <p>Discovery methods pass through free; tool/resource calls require payment:</p>
+        <div class="code-block">
+          <div class="code-header">Free Methods</div>
+          <pre><code>initialize, tools/list, resources/list, prompts/list, ping</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">Paid Methods (402)</div>
+          <pre><code>tools/call, resources/read, prompts/get — all other methods</code></pre>
+        </div>
+
+        <h3>Endpoints</h3>
+        <div class="table-responsive">
+          <table>
+            <tr>
+              <th>Endpoint</th>
+              <th>Method</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td><code>POST /api/mcp/proxy</code></td>
+              <td>POST</td>
+              <td>Forward MCP requests (payment-gated)</td>
+            </tr>
+            <tr>
+              <td><code>POST /api/mcp/register</code></td>
+              <td>POST</td>
+              <td>Register an MCP server for proxying</td>
+            </tr>
+            <tr>
+              <td><code>GET /api/mcp/servers</code></td>
+              <td>GET</td>
+              <td>List registered MCP servers</td>
+            </tr>
+            <tr>
+              <td><code>POST /api/mcp/wrap</code></td>
+              <td>POST</td>
+              <td>Inline payment check for self-hosted MCP</td>
+            </tr>
+          </table>
+        </div>
+      </section>
+
+      <!-- Browser Gate -->
+      <section id="browser-gate">
+        <h2>Browser Gate — Detect Agentic Browsers</h2>
+        <p>
+          Client-side JavaScript that detects headless browsers, Puppeteer, Playwright, Selenium, 
+          and other automated browsing tools. Shows a payment overlay for automated access while 
+          real human users pass through unaffected.
+        </p>
+
+        <h3>Drop-In Script</h3>
+        <div class="code-block">
+          <div class="code-header">HTML</div>
+          <pre><code>&lt;script src="https://agenttoll-production.up.railway.app/js/browser-gate.js"
+        data-publisher-key="YOUR_KEY"
+        data-amount="0.05"&gt;
+&lt;/script&gt;</code></pre>
+        </div>
+
+        <h3>Detection Signals (20+)</h3>
+        <div class="table-responsive">
+          <table>
+            <tr>
+              <th>Signal</th>
+              <th>Score</th>
+              <th>Detects</th>
+            </tr>
+            <tr>
+              <td><code>navigator.webdriver</code></td>
+              <td>+40</td>
+              <td>Selenium, Puppeteer, Playwright</td>
+            </tr>
+            <tr>
+              <td>HeadlessChrome UA</td>
+              <td>+50</td>
+              <td>Headless Chrome</td>
+            </tr>
+            <tr>
+              <td>CDP markers</td>
+              <td>+50</td>
+              <td>Chrome DevTools Protocol automation</td>
+            </tr>
+            <tr>
+              <td>Selenium markers</td>
+              <td>+50</td>
+              <td>Selenium WebDriver</td>
+            </tr>
+            <tr>
+              <td>Playwright markers</td>
+              <td>+50</td>
+              <td>Playwright framework</td>
+            </tr>
+            <tr>
+              <td>Zero plugins</td>
+              <td>+20</td>
+              <td>Headless browsers with no plugins</td>
+            </tr>
+            <tr>
+              <td>Zero dimensions</td>
+              <td>+25</td>
+              <td>Off-screen rendering</td>
+            </tr>
+          </table>
+        </div>
+        <p>Threshold: confidence ≥ 40% triggers the payment gate.</p>
+
+        <h3>Modes</h3>
+        <div class="code-block">
+          <div class="code-header">HTML Attributes</div>
+          <pre><code>data-mode="overlay"   — Payment overlay on top of content (default)
+data-mode="redirect"  — Redirect to payment page
+data-mode="block"     — Replace page entirely with payment notice</code></pre>
+        </div>
+
+        <h3>Programmatic API</h3>
+        <div class="code-block">
+          <div class="code-header">JavaScript</div>
+          <pre><code>// After loading browser-gate.js:
+const result = window.AgentTollBrowserGate.detect();
+console.log(result.isBot);       // boolean
+console.log(result.signals);     // ['navigator.webdriver=true', ...]
+console.log(result.confidence);  // 0-100</code></pre>
+        </div>
+      </section>
+
+      <!-- robots.txt -->
+      <section id="robots-txt">
+        <h2>robots.txt with x402 Signals</h2>
+        <p>
+          Auto-generated robots.txt that blocks all known AI crawlers and includes x402 payment 
+          URLs as comments, signaling that paid access is available.
+        </p>
+
+        <div class="code-block">
+          <div class="code-header">Example Output</div>
+          <pre><code># robots.txt with x402 Payment Protocol
+# AI agents: paid access available via x402
+# Payment URL: https://agenttoll-production.up.railway.app/pay?publisher=YOUR_KEY
+
+User-agent: GPTBot
+Disallow: /
+# x402-payment: https://agenttoll-production.up.railway.app/pay?publisher=YOUR_KEY&amount=0.05
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+...40+ more AI crawler blocks</code></pre>
         </div>
       </section>
 

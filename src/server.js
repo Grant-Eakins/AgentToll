@@ -8,6 +8,8 @@ import { verifyRoutes } from './routes/verify.js';
 import { analyticsRoutes } from './routes/analytics.js';
 import { publisherRoutes } from './routes/publisher.js';
 import { docsRoutes } from './routes/docs.js';
+import { mcpProxyRoutes } from './routes/mcp-proxy.js';
+import { generateRobotsTxt } from '../sdk/content-gate.js';
 
 dotenv.config();
 
@@ -99,6 +101,15 @@ app.use('/api/verify', verifyRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/publisher', publisherRoutes);
 app.use('/api/docs', docsRoutes);
+app.use('/api/mcp', mcpProxyRoutes);
+
+// Dynamic robots.txt with x402 signals
+app.get('/robots.txt', (req, res) => {
+  const publisherKey = req.query.publisher || '';
+  const amount = parseFloat(req.query.amount || '0.001');
+  res.type('text/plain');
+  res.send(generateRobotsTxt({ apiKey: publisherKey, amount }));
+});
 
 // Serve static HTML pages
 app.get('/docs', (req, res) => {
