@@ -1,6 +1,6 @@
 {
   "name": "@agenttoll/sdk",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "One-line micropayment integration for AI agents - Express, Cloudflare Workers, Vercel Edge, MCP, Browser",
   "main": "tollbooth.js",
   "exports": {

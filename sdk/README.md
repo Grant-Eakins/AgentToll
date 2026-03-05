@@ -26,7 +26,7 @@ const response = await fetch('https://toll.agenttoll.xyz/api/publisher/register'
 const { api_key } = await response.json();
 ```
 
-Or use the web form at [toll.agenttoll.xyz](https://toll.agenttoll.xyz)
+Or use the web dashboard at [www.agenttoll.xyz/dashboard](https://www.agenttoll.xyz/dashboard)
 
 ### 2. Add to Your Server
 
