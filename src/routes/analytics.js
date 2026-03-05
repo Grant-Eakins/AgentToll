@@ -228,6 +228,34 @@ router.get('/agents-stopped/live', (req, res) => {
   });
 });
 
+/**
+ * POST /api/analytics/agent-blocked
+ * Receive browser-gate detection events (sent via navigator.sendBeacon)
+ */
+router.post('/agent-blocked', async (req, res) => {
+  try {
+    const { publisher_key, signals, confidence, user_agent, resource, source } = req.body;
+
+    if (publisher_key) {
+      // Record as an agent stop
+      const agentType = source === 'browser-gate' ? 'headless-browser' : 'unknown-bot';
+      await recordAgentStopped(publisher_key, {
+        user_agent: user_agent || 'unknown',
+        agent_type: agentType,
+        resource: resource || '/',
+        confidence: confidence || 0,
+        signals: signals || [],
+        source: source || 'browser-gate',
+      });
+    }
+
+    // Always return 200 (beacons don't read responses)
+    res.status(200).json({ ok: true });
+  } catch {
+    res.status(200).json({ ok: true });
+  }
+});
+
 // Helper function for timeframe parsing
 function parseTimeframe(tf) {
   const match = tf.match(/^(\d+)(h|d|w|m)$/);

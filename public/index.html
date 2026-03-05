@@ -19,6 +19,7 @@
         <img src="/Copilot_20260217_123447.png" alt="AgentToll" class="logo-text-img">
       </a>
       <div class="nav-links">
+        <a href="#what-we-block">What We Block</a>
         <a href="#how-it-works">How it Works</a>
         <a href="#publishers">Publishers</a>
         <a href="#agents">Agents</a>
@@ -119,6 +120,211 @@ app.<span class="code-function">get</span>(<span class="code-string">'/api/v1/we
 
 app.<span class="code-function">listen</span>(<span class="code-number">3000</span>);</code></pre>
       </div>
+    </div>
+  </section>
+
+  <!-- What AgentToll Blocks -->
+  <section id="what-we-block" class="section section-alt">
+    <div class="container">
+      <div class="section-header">
+        <h2>Complete AI Agent Protection</h2>
+        <p>AgentToll blocks or paywalls <strong>every known vector</strong> that AI agents use to access your content.</p>
+      </div>
+
+      <!-- Protection layers summary -->
+      <div class="protection-layers">
+        <div class="layer-card">
+          <div class="layer-icon">🛡️</div>
+          <div class="layer-label">4 Protection Layers</div>
+        </div>
+        <div class="layer-card">
+          <div class="layer-icon">🤖</div>
+          <div class="layer-label">90+ Agent Patterns</div>
+        </div>
+        <div class="layer-card">
+          <div class="layer-icon">🔍</div>
+          <div class="layer-label">20+ Browser Signals</div>
+        </div>
+        <div class="layer-card">
+          <div class="layer-icon">🌐</div>
+          <div class="layer-label">40+ Crawler Blocks</div>
+        </div>
+      </div>
+
+      <!-- Threat categories grid -->
+      <div class="threat-grid">
+
+        <!-- Layer 1: API / SDK Middleware -->
+        <div class="threat-category">
+          <div class="threat-header">
+            <span class="threat-number">1</span>
+            <h3>API & SDK Middleware</h3>
+            <span class="threat-badge">tollbooth.js</span>
+          </div>
+          <p class="threat-desc">Server-side User-Agent detection on your API routes. Blocks or paywalls every known AI agent.</p>
+          <div class="threat-list">
+            <div class="threat-group">
+              <h4>AI Providers</h4>
+              <span class="threat-tag">OpenAI / GPT</span>
+              <span class="threat-tag">Claude / Anthropic</span>
+              <span class="threat-tag">Google Gemini</span>
+              <span class="threat-tag">Cohere</span>
+              <span class="threat-tag">Mistral</span>
+              <span class="threat-tag">Meta AI</span>
+              <span class="threat-tag">Perplexity</span>
+              <span class="threat-tag">xAI / Grok</span>
+            </div>
+            <div class="threat-group">
+              <h4>Agent Frameworks</h4>
+              <span class="threat-tag">LangChain</span>
+              <span class="threat-tag">CrewAI</span>
+              <span class="threat-tag">AutoGPT</span>
+              <span class="threat-tag">AgentGPT</span>
+              <span class="threat-tag">BabyAGI</span>
+              <span class="threat-tag">SuperAgent</span>
+              <span class="threat-tag">OpenClaw</span>
+              <span class="threat-tag">AutoGen</span>
+            </div>
+            <div class="threat-group">
+              <h4>HTTP Libraries</h4>
+              <span class="threat-tag">Python requests</span>
+              <span class="threat-tag">httpx / aiohttp</span>
+              <span class="threat-tag">Node fetch / axios</span>
+              <span class="threat-tag">Go-http-client</span>
+              <span class="threat-tag">curl</span>
+              <span class="threat-tag">wget</span>
+            </div>
+            <div class="threat-group">
+              <h4>Crawlers & Scrapers</h4>
+              <span class="threat-tag">Scrapy</span>
+              <span class="threat-tag">Apify</span>
+              <span class="threat-tag">DataForSeo</span>
+              <span class="threat-tag">SemrushBot</span>
+              <span class="threat-tag">AhrefsBot</span>
+              <span class="threat-tag">MJ12bot</span>
+              <span class="threat-tag">DotBot</span>
+              <span class="threat-tag">Bytespider</span>
+            </div>
+            <div class="threat-group">
+              <h4>Catch-All Patterns</h4>
+              <span class="threat-tag threat-wildcard">*bot*</span>
+              <span class="threat-tag threat-wildcard">*agent*</span>
+              <span class="threat-tag threat-wildcard">*crawler*</span>
+              <span class="threat-tag threat-wildcard">*spider*</span>
+              <span class="threat-tag threat-wildcard">*scraper*</span>
+              <span class="threat-tag threat-wildcard">*fetch*</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Layer 2: Content Gate -->
+        <div class="threat-category">
+          <div class="threat-header">
+            <span class="threat-number">2</span>
+            <h3>Content Gate — HTML Pages</h3>
+            <span class="threat-badge">content-gate.js</span>
+          </div>
+          <p class="threat-desc">Protects HTML pages from agentic search engines that scrape & summarize your content without paying.</p>
+          <div class="threat-list">
+            <div class="threat-group">
+              <h4>Agentic Search</h4>
+              <span class="threat-tag">SearchGPT / OAI-SearchBot</span>
+              <span class="threat-tag">Perplexity Search</span>
+              <span class="threat-tag">Google AI Overviews</span>
+              <span class="threat-tag">Bing AI / Copilot</span>
+              <span class="threat-tag">You.com</span>
+              <span class="threat-tag">Brave Search AI</span>
+              <span class="threat-tag">Phind</span>
+              <span class="threat-tag">Kagi</span>
+            </div>
+            <div class="threat-group">
+              <h4>AI Training Crawlers</h4>
+              <span class="threat-tag">GPTBot</span>
+              <span class="threat-tag">Google-Extended</span>
+              <span class="threat-tag">CCBot (Common Crawl)</span>
+              <span class="threat-tag">Amazonbot</span>
+              <span class="threat-tag">FacebookBot</span>
+              <span class="threat-tag">Bytespider (TikTok)</span>
+              <span class="threat-tag">Diffbot</span>
+              <span class="threat-tag">Cohere-AI</span>
+            </div>
+            <div class="threat-group">
+              <h4>Also includes</h4>
+              <span class="threat-tag">x402 meta tags in 402 responses</span>
+              <span class="threat-tag">Social preview bots allowed (Twitter, FB, Slack)</span>
+              <span class="threat-tag">Real browsers always pass through</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Layer 3: MCP Proxy -->
+        <div class="threat-category">
+          <div class="threat-header">
+            <span class="threat-number">3</span>
+            <h3>MCP Payment Proxy</h3>
+            <span class="threat-badge">mcp-proxy.js</span>
+          </div>
+          <p class="threat-desc">Paywalls any MCP (Model Context Protocol) server. Agents must pay before calling tools.</p>
+          <div class="threat-list">
+            <div class="threat-group">
+              <h4>MCP Clients Gated</h4>
+              <span class="threat-tag">Claude Desktop</span>
+              <span class="threat-tag">Cursor / Windsurf</span>
+              <span class="threat-tag">MCP-compatible agents</span>
+              <span class="threat-tag">Custom MCP integrations</span>
+            </div>
+            <div class="threat-group">
+              <h4>How It Works</h4>
+              <span class="threat-tag">Free: tools/list, initialize, ping</span>
+              <span class="threat-tag">Paid: tools/call, resources/read</span>
+              <span class="threat-tag">Zero changes to your MCP server</span>
+              <span class="threat-tag">402 JSON-RPC error with payment info</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Layer 4: Browser Gate -->
+        <div class="threat-category">
+          <div class="threat-header">
+            <span class="threat-number">4</span>
+            <h3>Browser Gate — Headless Detection</h3>
+            <span class="threat-badge">browser-gate.js</span>
+          </div>
+          <p class="threat-desc">Client-side JavaScript detecting automated browsers. Real humans are never affected.</p>
+          <div class="threat-list">
+            <div class="threat-group">
+              <h4>Headless Browsers</h4>
+              <span class="threat-tag">Puppeteer</span>
+              <span class="threat-tag">Playwright</span>
+              <span class="threat-tag">Selenium</span>
+              <span class="threat-tag">HeadlessChrome</span>
+              <span class="threat-tag">PhantomJS</span>
+              <span class="threat-tag">Nightmare</span>
+            </div>
+            <div class="threat-group">
+              <h4>Detection Signals</h4>
+              <span class="threat-tag">navigator.webdriver</span>
+              <span class="threat-tag">CDP markers</span>
+              <span class="threat-tag">Selenium DOM markers</span>
+              <span class="threat-tag">Zero plugins / dimensions</span>
+              <span class="threat-tag">Missing Permissions API</span>
+              <span class="threat-tag">Agentic User-Agent strings</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- robots.txt callout -->
+      <div class="robots-callout">
+        <div class="robots-icon">📄</div>
+        <div class="robots-text">
+          <h4>Auto-generated robots.txt</h4>
+          <p>Blocks 40+ AI crawlers and embeds x402 payment URLs so compliant agents can pay for access instead of being turned away entirely.</p>
+        </div>
+        <a href="/robots.txt" class="btn btn-ghost" target="_blank">View robots.txt →</a>
+      </div>
+
     </div>
   </section>
 

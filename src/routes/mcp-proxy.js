@@ -18,7 +18,7 @@
 
 import { Router } from 'express';
 import { verifyAccessToken } from '../utils/jwt.js';
-import { getPublisher } from './publisher.js';
+import { getPublisher, setPublisher } from './publisher.js';
 
 const router = Router();
 
@@ -186,6 +186,13 @@ router.post('/register', async (req, res) => {
   };
 
   publisher.mcp_servers.push(mcpConfig);
+
+  // Persist to Supabase / memory
+  try {
+    await setPublisher(publisherKey, { mcp_servers: publisher.mcp_servers });
+  } catch (err) {
+    console.error('Failed to persist MCP server config:', err);
+  }
 
   const proxyUrl = `${TOLL_API_BASE}/api/mcp/proxy`;
 

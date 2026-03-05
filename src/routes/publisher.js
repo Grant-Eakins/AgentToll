@@ -22,7 +22,7 @@ export async function getPublisher(apiKey) {
 }
 
 // Helper to set publisher (to Supabase or memory)
-async function setPublisher(apiKey, publisher, isNew = false) {
+export async function setPublisher(apiKey, publisher, isNew = false) {
   if (isSupabaseConfigured()) {
     if (isNew) {
       return await dbCreatePublisher(publisher);
