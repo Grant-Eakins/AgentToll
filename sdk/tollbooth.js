@@ -248,7 +248,7 @@ function build402Response(req, options) {
 /**
  * Express/Connect middleware factory
  * 
- * @param {string} apiKey - Your publisher API key from toll.agenttoll.io
+ * @param {string} apiKey - Your publisher API key from toll.agenttoll.xyz
  * @param {object} options - Configuration options
  * @returns {function} Express middleware
  * 

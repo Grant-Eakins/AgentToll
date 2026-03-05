@@ -338,8 +338,8 @@ function getApiDocs() {
           amount: 0.05,
           currency: 'USDC',
           network: 'solana',
-          pay_url: 'https://toll.agenttoll.io/pay?publisher=pk_xxx&amount=0.05&resource=...',
-          api_endpoint: 'https://toll.agenttoll.io/api/pay',
+          pay_url: 'https://toll.agenttoll.xyz/pay?publisher=pk_xxx&amount=0.05&resource=...',
+          api_endpoint: 'https://toll.agenttoll.xyz/api/pay',
         },
         x402: {
           version: 1,
@@ -356,7 +356,7 @@ function getApiDocs() {
         'X-402-Version': '1',
         'X-402-Amount': '0.05',
         'X-402-Currency': 'USDC',
-        'X-402-Pay-URL': 'https://toll.agenttoll.io/pay?...',
+        'X-402-Pay-URL': 'https://toll.agenttoll.xyz/pay?...',
       },
     },
 

@@ -52,8 +52,8 @@ export async function getPublisherCount() {
 router.post('/register', async (req, res) => {
   const { name, website, email, wallet_address, wallets } = req.body;
 
-  if (!name || !email) {
-    return res.status(400).json({ error: 'Name and email required' });
+  if (!name) {
+    return res.status(400).json({ error: 'Name is required' });
   }
 
   // Require at least one wallet

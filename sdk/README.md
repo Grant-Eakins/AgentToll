@@ -14,7 +14,7 @@ npm install @agenttoll/sdk
 
 ```javascript
 // Via API
-const response = await fetch('https://toll.agenttoll.io/api/publisher/register', {
+const response = await fetch('https://toll.agenttoll.xyz/api/publisher/register', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -26,7 +26,7 @@ const response = await fetch('https://toll.agenttoll.io/api/publisher/register',
 const { api_key } = await response.json();
 ```
 
-Or use the web form at [toll.agenttoll.io](https://toll.agenttoll.io)
+Or use the web form at [toll.agenttoll.xyz](https://toll.agenttoll.xyz)
 
 ### 2. Add to Your Server
 
@@ -124,4 +124,4 @@ Then point agents to the proxy URL. Free methods (tools/list, initialize) pass t
 
 ## Full Documentation
 
-See [toll.agenttoll.io/docs](https://toll.agenttoll.io/docs)
+See [www.agenttoll.xyz/docs](https://www.agenttoll.xyz/docs)
