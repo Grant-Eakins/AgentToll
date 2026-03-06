@@ -548,22 +548,43 @@
       <section id="quick-start">
         <h2>Quick Start</h2>
         
-        <h3>1. Register as a Publisher</h3>
+        <h3>1. Install the SDK</h3>
+        <div class="code-block">
+          <pre>npm install @agenttoll/sdk</pre>
+        </div>
+
+        <h3>2. Generate Your API Key</h3>
+        <p>The fastest way — one command that registers your project, configures pricing, and writes your <code>.env</code>:</p>
+        <div class="code-block">
+          <pre>npx agenttoll init</pre>
+        </div>
+        <p>This will interactively walk you through:</p>
+        <ul style="margin: 12px 0 12px 20px; color: var(--text-secondary);">
+          <li>Wallet setup (paste an existing wallet or generate a new one)</li>
+          <li>Project name and optional email</li>
+          <li>Pricing — amount per request/session/pass</li>
+          <li>Access mode — per-request, session, or pass</li>
+          <li>Duration and human bypass settings</li>
+        </ul>
+
+        <p><strong>CLI options:</strong></p>
+        <div class="code-block">
+          <pre>npx agenttoll init                                  # Interactive setup
+npx agenttoll init &lt;WALLET&gt;                          # Quick (auto-detect chain)
+npx agenttoll init --solana &lt;ADDR&gt; --base &lt;0xADDR&gt;   # Both wallets
+npx agenttoll init -y --solana &lt;ADDR&gt;                # Non-interactive (defaults)</pre>
+        </div>
+
+        <p>You can also register via the <a href="/dashboard">web dashboard</a> or directly via API:</p>
         <div class="code-block">
           <pre>curl -X POST https://agenttoll-production.up.railway.app/api/publisher/register \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Your Company",
-    "email": "you@example.com",
     "wallets": { "solana": "YOUR_WALLET_ADDRESS" }
   }'</pre>
         </div>
         <p>You'll receive an API key like <code>pk_live_abc123...</code></p>
-
-        <h3>2. Install the SDK</h3>
-        <div class="code-block">
-          <pre>npm install @agenttoll/sdk</pre>
-        </div>
 
         <h3>3. Add to Your Server</h3>
         <div class="code-block">
