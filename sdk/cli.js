@@ -139,7 +139,6 @@ function generateSolanaWallet() {
   return {
     publicKey: base58Encode(pubBytes),
     privateKey: base58Encode(keypairBytes),
-    privateKeyJson: JSON.stringify(Array.from(keypairBytes)),
   };
 }
 
@@ -330,7 +329,6 @@ async function init(flags) {
         console.log('');
         console.log('  ⚠️  SAVE YOUR PRIVATE KEY — it will NOT be shown again!');
         console.log('  Import it into Phantom or Solflare to access your funds.');
-        console.log(`  Keypair JSON (for Solana CLI): ${wallet.privateKeyJson}`);
         console.log('');
         await ask('  Press Enter when you\'ve saved your private key', '');
       } else if (walletChoice === 'paste') {
