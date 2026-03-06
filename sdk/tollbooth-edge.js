@@ -112,6 +112,18 @@ function build402(request, apiKey, amount) {
  * })
  */
 export function tollgate(apiKey, options = {}) {
+  // ── Missing API key? Loud warning with setup instructions ──
+  if (!apiKey || apiKey === 'undefined' || apiKey === 'your-api-key') {
+    console.warn([
+      '',
+      '\x1b[33m⚠️  AgentToll: No API key provided!\x1b[0m',
+      '',
+      '   Run: \x1b[1mnpx agenttoll init\x1b[0m',
+      '   Or visit: https://www.agenttoll.xyz/dashboard',
+      '',
+    ].join('\n'));
+  }
+
   const MINIMUM_AMOUNT = 0.05;
   const amount = Math.max(options.amount || 0.05, MINIMUM_AMOUNT);
   const freeForHumans = options.freeForHumans ?? false;
@@ -158,6 +170,10 @@ export function tollgate(apiKey, options = {}) {
  * Middleware for edge frameworks (Hono, itty-router, etc.)
  */
 export function tollMiddleware(apiKey, options = {}) {
+  if (!apiKey || apiKey === 'undefined' || apiKey === 'your-api-key') {
+    console.warn('\x1b[33m⚠️  AgentToll: No API key! Run: npx agenttoll init\x1b[0m');
+  }
+
   const MINIMUM_AMOUNT = 0.05;
   const amount = Math.max(options.amount || 0.05, MINIMUM_AMOUNT);
   const freeForHumans = options.freeForHumans ?? false;

@@ -161,6 +161,18 @@ function buildGatedHTML(req, options) {
  * @returns {function} Express middleware
  */
 export function contentGate(apiKey, options = {}) {
+  // ── Missing API key? Loud warning with setup instructions ──
+  if (!apiKey || apiKey === 'undefined' || apiKey === 'your-api-key') {
+    console.warn([
+      '',
+      '\x1b[33m⚠️  AgentToll: No API key provided!\x1b[0m',
+      '',
+      '   Run: \x1b[1mnpx agenttoll init\x1b[0m',
+      '   Or visit: https://www.agenttoll.xyz/dashboard',
+      '',
+    ].join('\n'));
+  }
+
   const config = {
     amount: options.amount || 0.001,
     paths: options.paths || ['*'],

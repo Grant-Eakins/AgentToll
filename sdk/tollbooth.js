@@ -265,6 +265,24 @@ function build402Response(req, options) {
  * }));
  */
 function tollbooth(apiKey, options = {}) {
+  // ── Missing API key? Loud warning with setup instructions ──
+  if (!apiKey || apiKey === 'undefined' || apiKey === 'your-api-key') {
+    const msg = [
+      '',
+      '\x1b[33m⚠️  AgentToll: No API key provided!\x1b[0m',
+      '',
+      '   Run this to generate one:',
+      '   \x1b[1mnpx agenttoll init\x1b[0m',
+      '',
+      '   Or get one at: https://www.agenttoll.xyz/dashboard',
+      '',
+      '   Then pass it to tollbooth:',
+      '   \x1b[2mapp.use(tollbooth(process.env.AGENTTOLL_KEY))\x1b[0m',
+      '',
+    ].join('\n');
+    console.warn(msg);
+  }
+
   const MINIMUM_AMOUNT = 0.05;
   const config = {
     amount: Math.max(options.amount || 0.05, MINIMUM_AMOUNT),
