@@ -58,7 +58,7 @@ Example agent flow:
      "payment": {
      "amount": 0.05,
        "currency": "USDC",
-       "pay_url": "https://toll.agenttoll.xyz/pay?..."
+       "pay_url": "https://www.agenttoll.xyz/pay?..."
      }
    }
 

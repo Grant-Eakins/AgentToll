@@ -17,7 +17,7 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { resolve, basename } from 'path';
 import { generateKeyPairSync, randomBytes, createHash, createECDH } from 'crypto';
 
-const API_BASE = process.env.AGENTTOLL_API || 'https://toll.agenttoll.xyz';
+const API_BASE = process.env.AGENTTOLL_API || 'https://www.agenttoll.xyz';
 const ENV_FILE = resolve(process.cwd(), '.env');
 const DASHBOARD_URL = 'https://www.agenttoll.xyz/dashboard';
 const DOCS_URL = 'https://www.agenttoll.xyz/docs';

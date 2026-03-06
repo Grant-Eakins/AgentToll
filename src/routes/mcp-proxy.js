@@ -22,7 +22,7 @@ import { getPublisher, setPublisher } from './publisher.js';
 
 const router = Router();
 
-const TOLL_API_BASE = process.env.TOLL_API_URL || 'https://agenttoll-production.up.railway.app';
+const TOLL_API_BASE = process.env.TOLL_API_URL || 'https://www.agenttoll.xyz';
 
 /**
  * POST /api/mcp/proxy

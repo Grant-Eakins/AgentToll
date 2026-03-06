@@ -577,7 +577,7 @@ npx agenttoll init -y --solana &lt;ADDR&gt;                # Non-interactive (de
 
         <p>You can also register via the <a href="/dashboard">web dashboard</a> or directly via API:</p>
         <div class="code-block">
-          <pre>curl -X POST https://agenttoll-production.up.railway.app/api/publisher/register \
+          <pre>curl -X POST https://www.agenttoll.xyz/api/publisher/register \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Your Company",
@@ -804,7 +804,7 @@ app.get('/api/premium/data', (req, res) => {
     "currency": "USDC",
     "network": "solana",
     "receiver_wallet": "ABC123...",
-    "pay_url": "https://agenttoll-production.up.railway.app/pay?..."
+    "pay_url": "https://www.agenttoll.xyz/pay?..."
   },
   "access": {
     "mode": "session",
@@ -822,7 +822,7 @@ app.get('/api/premium/data', (req, res) => {
           <pre>X-402-Version: 1
 X-402-Amount: 0.05
 X-402-Currency: USDC
-X-402-Pay-URL: https://agenttoll-production.up.railway.app/pay?...</pre>
+X-402-Pay-URL: https://www.agenttoll.xyz/pay?...</pre>
         </div>
       </section>
 
@@ -1022,7 +1022,7 @@ X-402-Pay-URL: https://agenttoll-production.up.railway.app/pay?...</pre>
         
         <h4>Option 2: cURL</h4>
         <div class="code-block">
-          <pre>curl -X POST https://agenttoll-production.up.railway.app/api/publisher/register \
+          <pre>curl -X POST https://www.agenttoll.xyz/api/publisher/register \
   -H "Content-Type: application/json" \
   -d '{
     "name": "My API",
@@ -1299,7 +1299,7 @@ app.get('/robots.txt', (req, res) => {
           <pre><code>{
   "mcpServers": {
     "my-server": {
-      "url": "https://agenttoll-production.up.railway.app/api/mcp/proxy",
+      "url": "https://www.agenttoll.xyz/api/mcp/proxy",
       "headers": {
         "X-Publisher-Key": "YOUR_KEY",
         "X-MCP-Upstream": "http://your-server.com/mcp"
@@ -1364,7 +1364,7 @@ app.get('/robots.txt', (req, res) => {
         <h3>Drop-In Script</h3>
         <div class="code-block">
           <div class="code-header">HTML</div>
-          <pre><code>&lt;script src="https://agenttoll-production.up.railway.app/js/browser-gate.js"
+          <pre><code>&lt;script src="https://www.agenttoll.xyz/js/browser-gate.js"
         data-publisher-key="YOUR_KEY"
         data-amount="0.05"&gt;
 &lt;/script&gt;</code></pre>
@@ -1448,11 +1448,11 @@ console.log(result.confidence);  // 0-100</code></pre>
           <div class="code-header">Example Output</div>
           <pre><code># robots.txt with x402 Payment Protocol
 # AI agents: paid access available via x402
-# Payment URL: https://agenttoll-production.up.railway.app/pay?publisher=YOUR_KEY
+# Payment URL: https://www.agenttoll.xyz/pay?publisher=YOUR_KEY
 
 User-agent: GPTBot
 Disallow: /
-# x402-payment: https://agenttoll-production.up.railway.app/pay?publisher=YOUR_KEY&amount=0.05
+# x402-payment: https://www.agenttoll.xyz/pay?publisher=YOUR_KEY&amount=0.05
 
 User-agent: ChatGPT-User
 Disallow: /

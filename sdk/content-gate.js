@@ -16,7 +16,7 @@
  * app.use('/premium', contentGate('pk_live_xxx', { amount: 0.01 }));
  */
 
-const TOLL_API_BASE = process.env.TOLL_API_URL || 'https://agenttoll-production.up.railway.app';
+const TOLL_API_BASE = process.env.TOLL_API_URL || 'https://www.agenttoll.xyz';
 
 // Known AI search / scraper user-agent patterns
 const AGENTIC_SEARCH_PATTERNS = [
@@ -303,7 +303,7 @@ export function generateRobotsTxt(options = {}) {
 
   let txt = `# AgentToll robots.txt — x402 Payment Required
 # AI agents and crawlers must pay to access this content.
-# Learn more: https://agenttoll-production.up.railway.app/docs
+# Learn more: https://www.agenttoll.xyz/docs
 
 # x402 Payment Information
 # X-402-Amount: ${amount}

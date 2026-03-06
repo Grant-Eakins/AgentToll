@@ -36,7 +36,7 @@ npx agenttoll init -y --solana <ADDR>                # Non-interactive (defaults
 Or register manually:
 
 ```javascript
-const response = await fetch('https://toll.agenttoll.xyz/api/publisher/register', {
+const response = await fetch('https://www.agenttoll.xyz/api/publisher/register', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -121,7 +121,7 @@ app.get('/robots.txt', (req, res) => {
 Detect headless/agentic browsers (Puppeteer, Playwright, Selenium) on the client:
 
 ```html
-<script src="https://agenttoll-production.up.railway.app/js/browser-gate.js"
+<script src="https://www.agenttoll.xyz/js/browser-gate.js"
         data-publisher-key="YOUR_KEY"
         data-amount="0.05">
 </script>
@@ -135,7 +135,7 @@ Paywall any MCP server without modifying it:
 
 ```bash
 # Register your MCP server
-curl -X POST https://agenttoll-production.up.railway.app/api/mcp/register \
+curl -X POST https://www.agenttoll.xyz/api/mcp/register \
   -H "X-Publisher-Key: YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{"upstream_url": "http://localhost:8080/mcp", "name": "My MCP Server"}'

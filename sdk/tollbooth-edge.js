@@ -7,7 +7,7 @@
  * export default tollgate('your-api-key')
  */
 
-const TOLL_API_BASE = 'https://agenttoll-production.up.railway.app';
+const TOLL_API_BASE = 'https://www.agenttoll.xyz';
 
 const AGENT_PATTERNS = [
   // Platform-specific

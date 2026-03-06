@@ -10,7 +10,7 @@
  *   export default tollgate('your-api-key', { amount: 0.05 })
  */
 
-const TOLL_API_BASE = process.env.TOLL_API_URL || 'https://agenttoll-production.up.railway.app';
+const TOLL_API_BASE = process.env.TOLL_API_URL || 'https://www.agenttoll.xyz';
 
 // Agent detection patterns
 const AGENT_PATTERNS = [
@@ -248,7 +248,7 @@ function build402Response(req, options) {
 /**
  * Express/Connect middleware factory
  * 
- * @param {string} apiKey - Your publisher API key from toll.agenttoll.xyz
+ * @param {string} apiKey - Your publisher API key from www.agenttoll.xyz
  * @param {object} options - Configuration options
  * @returns {function} Express middleware
  * 

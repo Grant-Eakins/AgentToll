@@ -18,7 +18,7 @@ function getApiDocs() {
     name: 'AgentToll API',
     version: '1.0.0',
     description: 'Micropayment infrastructure for AI agents. Gate your API/content, agents pay in USDC.',
-    base_url: process.env.API_BASE_URL || 'https://agenttoll-production.up.railway.app',
+    base_url: process.env.API_BASE_URL || 'https://www.agenttoll.xyz',
     
     authentication: {
       publisher: {
@@ -338,8 +338,8 @@ function getApiDocs() {
           amount: 0.05,
           currency: 'USDC',
           network: 'solana',
-          pay_url: 'https://toll.agenttoll.xyz/pay?publisher=pk_xxx&amount=0.05&resource=...',
-          api_endpoint: 'https://toll.agenttoll.xyz/api/pay',
+          pay_url: 'https://www.agenttoll.xyz/pay?publisher=pk_xxx&amount=0.05&resource=...',
+          api_endpoint: 'https://www.agenttoll.xyz/api/pay',
         },
         x402: {
           version: 1,
@@ -356,7 +356,7 @@ function getApiDocs() {
         'X-402-Version': '1',
         'X-402-Amount': '0.05',
         'X-402-Currency': 'USDC',
-        'X-402-Pay-URL': 'https://toll.agenttoll.xyz/pay?...',
+        'X-402-Pay-URL': 'https://www.agenttoll.xyz/pay?...',
       },
     },
 

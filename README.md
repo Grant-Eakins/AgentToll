@@ -118,7 +118,7 @@ When an agent hits a tolled resource without payment:
     "amount": 0.05,
     "currency": "USDC",
     "network": "solana",
-    "pay_url": "https://toll.agenttoll.xyz/pay?..."
+    "pay_url": "https://www.agenttoll.xyz/pay?..."
   },
   "x402": {
     "version": 1,
@@ -140,7 +140,7 @@ Plus HTTP headers:
 X-402-Version: 1
 X-402-Amount: 0.05
 X-402-Currency: USDC
-X-402-Pay-URL: https://toll.agenttoll.xyz/pay?...
+X-402-Pay-URL: https://www.agenttoll.xyz/pay?...
 ```
 
 ## API Endpoints
@@ -190,7 +190,7 @@ BASE_RPC_URL=https://mainnet.base.org
 
 # Optional
 TOKEN_EXPIRY=3600
-API_BASE_URL=https://toll.agenttoll.xyz
+API_BASE_URL=https://www.agenttoll.xyz
 ```
 
 ## Why Now?

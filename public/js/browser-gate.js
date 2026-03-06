@@ -8,7 +8,7 @@
  * Real human users are never affected.
  * 
  * Usage:
- *   <script src="https://agenttoll-production.up.railway.app/js/browser-gate.js"
+ *   <script src="https://www.agenttoll.xyz/js/browser-gate.js"
  *           data-publisher-key="YOUR_KEY"
  *           data-amount="0.05">
  *   </script>
@@ -17,7 +17,7 @@
  *   <script src="/js/browser-gate.js"
  *           data-publisher-key="YOUR_KEY"
  *           data-amount="0.05"
- *           data-api-base="https://agenttoll-production.up.railway.app">
+ *           data-api-base="https://www.agenttoll.xyz">
  *   </script>
  */
 (function() {
@@ -29,7 +29,7 @@
   const script = document.currentScript;
   const PUBLISHER_KEY = script?.getAttribute('data-publisher-key') || '';
   const AMOUNT = parseFloat(script?.getAttribute('data-amount') || '0.05');
-  const API_BASE = script?.getAttribute('data-api-base') || 'https://agenttoll-production.up.railway.app';
+  const API_BASE = script?.getAttribute('data-api-base') || 'https://www.agenttoll.xyz';
   const MODE = script?.getAttribute('data-mode') || 'overlay'; // overlay | redirect | block
   const RESOURCE = script?.getAttribute('data-resource') || window.location.pathname;
 
