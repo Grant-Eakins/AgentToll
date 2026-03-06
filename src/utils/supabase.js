@@ -46,7 +46,6 @@ export async function createPublisher(publisher) {
       api_key: publisher.api_key,
       secret_key: publisher.secret_key,
       settings: publisher.settings,
-      tier: publisher.tier,
       revenue: publisher.revenue,
       created_at: new Date(publisher.created_at).toISOString(),
     })
