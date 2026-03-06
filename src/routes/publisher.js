@@ -70,8 +70,8 @@ router.post('/register', async (req, res) => {
   const publisher = {
     id: uuidv4(),
     name,
-    website,
-    email,
+    website: website || '',
+    email: email || '',
     wallet_address, // Legacy: Solana wallet
     wallets: {
       solana: wallets?.solana || wallet_address,
