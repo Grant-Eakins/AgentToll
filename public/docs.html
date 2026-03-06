@@ -500,7 +500,7 @@
       <a href="#how-tolling-works">How Tolling Works</a>
       <a href="#access-modes">Access Modes</a>
       <a href="#networks">Networks</a>
-      <a href="#pricing-tiers">Pricing Tiers</a>
+      <a href="#pricing-tiers">Pricing</a>
       
       <h4>Publisher Guide</h4>
       <a href="#register">Registration</a>
@@ -761,32 +761,32 @@ app.get('/api/premium/data', (req, res) => {
         </div>
       </section>
 
-      <!-- Pricing Tiers -->
+      <!-- Pricing -->
       <section id="pricing-tiers">
-        <h2>Pricing Tiers</h2>
+        <h2>Pricing</h2>
+        <p>AgentToll charges a flat <strong>5% platform fee</strong> on all transactions. No tiers, no hidden costs.</p>
         
         <table class="params-table">
           <tr>
-            <th>Tier</th>
+            <th>What You Set</th>
+            <th>What the Agent Pays</th>
+            <th>What You Receive</th>
             <th>Platform Fee</th>
-            <th>Requirements</th>
           </tr>
           <tr>
-            <td><span class="badge badge-standard">Standard</span></td>
-            <td>5%</td>
-            <td>Default for all publishers</td>
+            <td>$0.05 per request</td>
+            <td>$0.05 USDC</td>
+            <td>$0.0475</td>
+            <td>$0.0025 (5%)</td>
           </tr>
           <tr>
-            <td><span class="badge badge-premium">Premium</span></td>
-            <td>3%</td>
-            <td>&gt;$1000/mo revenue</td>
-          </tr>
-          <tr>
-            <td><span class="badge badge-enterprise">Enterprise</span></td>
-            <td>1% (customizable)</td>
-            <td>Custom contracts</td>
+            <td>$1.00 per session</td>
+            <td>$1.00 USDC</td>
+            <td>$0.95</td>
+            <td>$0.05 (5%)</td>
           </tr>
         </table>
+        <p style="margin-top: 12px; color: var(--text-secondary);">For business inquiries, contact <a href="https://x.com/0xgrante" target="_blank">@0xgrante</a></p>
       </section>
 
       <!-- 402 Response -->

@@ -220,7 +220,7 @@ function getApiDocs() {
             default_amount: { type: 'number', description: 'Default toll amount in USDC' },
             free_for_humans: { type: 'boolean', description: 'Let humans through free' },
             paths: { type: 'array', description: 'Paths to toll (glob patterns)' },
-            custom_fee_percent: { type: 'number', description: 'Custom fee (enterprise only, 0-15%)' },
+            custom_fee_percent: { type: 'number', description: 'Reserved for future use' },
             access_mode: { 
               type: 'string', 
               enum: ['per-request', 'session', 'pass'],
