@@ -54,7 +54,9 @@ export async function createPublisher(publisher) {
 
   if (error) {
     console.error('Supabase createPublisher error:', error);
-    return null;
+    const err = new Error(error.message || 'Supabase insert failed');
+    err.details = error;
+    throw err;
   }
   return data;
 }

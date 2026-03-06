@@ -98,10 +98,20 @@ router.post('/register', async (req, res) => {
   };
 
   // Save to database or memory
-  const saved = await setPublisher(apiKey, publisher, true);
+  let saved;
+  try {
+    saved = await setPublisher(apiKey, publisher, true);
+  } catch (err) {
+    console.error('Publisher save error:', err);
+    return res.status(500).json({
+      error: 'Failed to save publisher',
+      detail: err.message,
+      supabase: err.details || null,
+    });
+  }
 
   if (!saved) {
-    return res.status(500).json({ error: 'Failed to save publisher — please try again' });
+    return res.status(500).json({ error: 'Failed to save publisher — database returned null' });
   }
 
   res.json({
