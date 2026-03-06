@@ -12,14 +12,35 @@ npm install @agenttoll/sdk
 
 ### 1. Get Your API Key
 
+The fastest way — one command, writes your `.env` automatically:
+
+```bash
+npx agenttoll init
+```
+
+This will:
+- Generate or accept your Solana / Base wallet
+- Register your project and create an API key
+- Configure pricing, access mode, and duration
+- Write `AGENTTOLL_KEY=pk_...` to your `.env`
+
+**Options:**
+
+```bash
+npx agenttoll init                                  # Interactive setup
+npx agenttoll init <WALLET>                          # Quick (auto-detect chain)
+npx agenttoll init --solana <ADDR> --base <0xADDR>   # Both wallets
+npx agenttoll init -y --solana <ADDR>                # Non-interactive (defaults)
+```
+
+Or register manually:
+
 ```javascript
-// Via API
 const response = await fetch('https://toll.agenttoll.xyz/api/publisher/register', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
     name: 'My API',
-    email: 'you@example.com',
     wallet_address: 'YourSolanaWallet'
   })
 });
