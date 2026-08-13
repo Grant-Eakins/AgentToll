@@ -159,6 +159,9 @@
       /GPTBot/i, /ChatGPT/i, /Claude/i, /Anthropic/i,
       /PerplexityBot/i, /Bytespider/i, /Amazonbot/i,
       /CCBot/i, /Google-Extended/i, /Bingbot/i,
+      /Grok/i, /GrokBot/i, /DeepSeek/i, /Qwen/i,
+      /Diffbot/i, /Firecrawl/i, /Apify/i, /Tavily/i,
+      /HeadlessChrome/i, /Puppeteer/i, /Playwright/i,
     ];
     for (const pattern of agenticUAs) {
       if (pattern.test(navigator.userAgent)) {

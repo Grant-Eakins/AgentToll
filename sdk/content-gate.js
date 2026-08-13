@@ -31,6 +31,12 @@ const AGENTIC_SEARCH_PATTERNS = [
   /petalbot/i,
   /cohere-ai/i,
   /meta-externalagent/i,
+  /ia_archiver/i,
+  // Newer AI crawlers (2025-2026)
+  /grokbot/i, /xai/i, /deepseek/i, /qwen/i, /mistralbot/i,
+  /diffbot/i, /firecrawl/i, /apify/i, /exa-ai/i, /exabot/i, /tavily/i,
+  /youbot/i, /ai2bot/i, /brightdata/i, /bright-data/i,
+  /timpibot/i, /friendlycrawler/i, /imagesiftbot/i, /omgilibot/i,
   // SEO scrapers
   /semrushbot/i, /ahrefsbot/i, /dataforseo/i, /serpapi/i, /mj12bot/i,
   /dotbot/i, /rogerbot/i, /blexbot/i,
@@ -295,10 +301,19 @@ export function generateRobotsTxt(options = {}) {
     'ClaudeBot', 'Claude-Web', 'Anthropic-AI',
     'PerplexityBot',
     'CCBot', 'ByteSpider', 'Bytespider',
-    'AmazonBot', 'PetalBot',
+    'AmazonBot', 'PetalBot', 'AppleBot',
     'Cohere-AI', 'Meta-ExternalAgent',
+    'GrokBot',
+    'Diffbot',
+    'YouBot',
+    'FirecrawlBot',
+    'Ai2Bot',
+    'Timpibot',
+    'FriendlyCrawler',
+    'ImagesiftBot',
+    'YandexBot',
     'SemrushBot', 'AhrefsBot', 'DataForSeoBot',
-    'Scrapy', 'MJ12bot', 'DotBot',
+    'Scrapy', 'MJ12bot', 'DotBot', 'RogerBot',
   ];
 
   let txt = `# AgentToll robots.txt — x402 Payment Required

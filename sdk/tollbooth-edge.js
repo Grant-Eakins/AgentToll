@@ -20,15 +20,27 @@ const AGENT_PATTERNS = [
   // Agent frameworks
   /langchain/i, /autogpt/i, /agentgpt/i, /babyagi/i, /crewai/i,
   /superagent/i, /smolagent/i, /phidata/i, /haystack/i, /dify/i, /flowise/i,
+  /semantic\.kernel/i, /fixie/i, /dust\.tt/i,
+  /agno/i, /pydantic-ai/i, /mastra/i, /composio/i, /skyvern/i, /stagehand/i,
+  /browserbase/i, /e2b/i, /vercel-ai/i,
   // AI crawlers
   /gptbot/i, /chatgpt-user/i, /oai-searchbot/i, /claudebot/i, /claude-web/i,
   /anthropic-ai/i, /ccbot/i, /bytespider/i, /amazonbot/i, /petalbot/i,
+  /ia_archiver/i, /meta-externalagent/i,
+  // Newer AI providers (2025-2026)
+  /grok/i, /grokbot/i, /xai/i, /deepseek/i, /qwen/i, /mistralbot/i,
   // Social / platform bots
   /facebookbot/i, /facebot/i, /twitterbot/i, /slackbot/i, /discordbot/i,
   /telegrambot/i, /linkedinbot/i, /whatsapp/i, /yandexbot/i, /applebot/i,
+  // SEO / data scrapers
+  /semrushbot/i, /ahrefsbot/i, /dataforseo/i, /serpapi/i, /mj12bot/i,
+  /dotbot/i, /rogerbot/i, /blexbot/i,
+  /diffbot/i, /firecrawl/i, /apify/i, /exa-ai/i, /exabot/i, /tavily/i,
+  /youbot/i, /ai2bot/i, /brightdata/i, /bright-data/i,
+  /timpibot/i, /friendlycrawler/i, /imagesiftbot/i, /omgilibot/i,
   // HTTP libraries (programmatic access)
   /python-requests/i, /httpx/i, /axios/i, /node-fetch/i, /undici/i,
-  /go-http-client/i, /curl/i, /wget/i, /scrapy/i,
+  /go-http-client/i, /java\//i, /curl/i, /wget/i, /libwww-perl/i, /scrapy/i,
   // Headless browsers
   /headlesschrome/i, /phantomjs/i, /puppeteer/i, /playwright/i, /selenium/i,
   // Generic catch-all: anything with bot, agent, crawler, spider, scraper
