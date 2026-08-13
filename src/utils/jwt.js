@@ -72,13 +72,6 @@ export function verifyAccessToken(token, options = {}) {
       issuer: 'agenttoll',
     });
     
-    // Check if per-request token has been used
-    if (decoded.mode === 'per-request' && decoded.uses_remaining !== null) {
-      // In production: check against Redis/DB for token usage
-      // For MVP: per-request tokens are single-use by design
-      // The middleware should invalidate after first use
-    }
-    
     // Check resource scope (unless it's a pass)
     if (options.resource && decoded.scope !== '*') {
       // For session mode, check if resource matches

@@ -412,11 +412,14 @@ function getHourlyBreakdown(payments, timeMs) {
   return breakdown.slice(-24); // Return last 24 hours max
 }
 
-/**
- * Get platform-wide public stats for homepage
- * In production: cache this and update every minute
- */
+let _statsCache = null;
+let _statsCacheTime = 0;
+const STATS_CACHE_TTL = 60_000; // 1 minute
+
 export async function getPlatformStats() {
+  if (_statsCache && Date.now() - _statsCacheTime < STATS_CACHE_TTL) {
+    return _statsCache;
+  }
   // Get publisher count from Supabase or memory
   const registeredPublishers = await getPublisherCount();
   
@@ -446,7 +449,7 @@ export async function getPlatformStats() {
     uniqueAgents = new Set(payments.filter(p => p.agent_id).map(p => p.agent_id)).size;
   }
 
-  return {
+  _statsCache = {
     publishers: registeredPublishers,
     agents_stopped: agentsStopped,
     total_volume_usdc: totalRevenue,
@@ -456,4 +459,6 @@ export async function getPlatformStats() {
     unique_agents: uniqueAgents,
     updated_at: new Date().toISOString(),
   };
+  _statsCacheTime = Date.now();
+  return _statsCache;
 }

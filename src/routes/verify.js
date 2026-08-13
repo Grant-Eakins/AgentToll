@@ -4,6 +4,9 @@ import { recordAccess } from '../utils/analytics.js';
 
 const router = Router();
 
+// Track used per-request token JTIs; TTL matches the 5-min token expiry
+const usedPerRequestTokens = new Set();
+
 /**
  * POST /api/verify
  * Verify an access token (called by publisher middleware)
@@ -35,6 +38,18 @@ router.post('/', async (req, res) => {
         error: 'Invalid or expired token',
         agent_hint: 'Token expired or invalid. Make a new payment.',
       });
+    }
+
+    // Enforce single-use for per-request tokens
+    if (decoded.mode === 'per-request') {
+      if (usedPerRequestTokens.has(decoded.jti)) {
+        return res.status(401).json({
+          valid: false,
+          error: 'Token already used',
+          agent_hint: 'Per-request tokens are single-use. Make a new payment.',
+        });
+      }
+      usedPerRequestTokens.add(decoded.jti);
     }
 
     // Optionally check publisher match

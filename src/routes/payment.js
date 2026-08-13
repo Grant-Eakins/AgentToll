@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { generateAccessToken } from '../utils/jwt.js';
 import { recordPayment, isSupabaseConfigured, dbIsTransactionUsed, dbMarkTransactionUsed } from '../utils/analytics.js';
-import { getPublisher } from './publisher.js';
+import { getPublisher, setPublisher } from './publisher.js';
 
 const router = Router();
 
@@ -152,12 +152,14 @@ router.post('/', async (req, res) => {
     const platformFee = amount * (feePercent / 100);
     const publisherReceives = amount - platformFee;
 
-    // Update publisher revenue (in production: use database transactions)
+    // Persist updated revenue to Supabase
     if (publisherData) {
-      publisherData.revenue.total_gross += amount;
-      publisherData.revenue.total_net += publisherReceives;
-      publisherData.revenue.platform_fees_paid += platformFee;
-      // Note: revenue updates are tracked via payment records in Supabase
+      publisherData.revenue.total_gross = (publisherData.revenue.total_gross || 0) + amount;
+      publisherData.revenue.total_net = (publisherData.revenue.total_net || 0) + publisherReceives;
+      publisherData.revenue.platform_fees_paid = (publisherData.revenue.platform_fees_paid || 0) + platformFee;
+      setPublisher(publisher, { revenue: publisherData.revenue }).catch(e =>
+        console.error('Revenue update failed (non-fatal):', e.message)
+      );
     }
 
     // Get access mode settings from publisher
