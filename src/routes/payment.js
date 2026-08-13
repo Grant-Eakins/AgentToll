@@ -9,6 +9,7 @@ const router = Router();
 // Solana configuration
 const SOLANA_RPC = process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
 const connection = new Connection(SOLANA_RPC);
+const SOLANA_USDC_MINT = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
 
 // Base (Ethereum L2) configuration
 const BASE_RPC = process.env.BASE_RPC_URL || 'https://mainnet.base.org';
@@ -111,12 +112,24 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Verify the payment based on network
+    // Look up publisher to get receiver wallet before on-chain verification
+    const publisherData = await getPublisher(publisher);
+    if (!publisherData) {
+      return res.status(404).json({ error: 'Publisher not found', agent_hint: 'Invalid publisher key.' });
+    }
+    const publisherWallet = network === 'base'
+      ? publisherData.wallets?.base
+      : publisherData.wallets?.solana || publisherData.wallet_address;
+    if (!publisherWallet) {
+      return res.status(400).json({ error: `Publisher has no ${network} wallet configured` });
+    }
+
+    // Verify the payment on-chain
     let verification;
     if (network === 'base') {
-      verification = await verifyBasePayment(tx_hash, amount);
+      verification = await verifyBasePayment(tx_hash, amount, publisherWallet);
     } else {
-      verification = await verifySolanaPayment(tx_signature, amount);
+      verification = await verifySolanaPayment(tx_signature, amount, publisherWallet);
     }
     
     if (!verification.valid) {
@@ -134,8 +147,7 @@ router.post('/', async (req, res) => {
       await dbMarkTransactionUsed(txId, { network, publisherKey: publisher, amount });
     }
 
-    // Look up publisher and calculate fees (flat 5%)
-    const publisherData = await getPublisher(publisher);
+    // Calculate fees (flat 5%)
     const feePercent = getEffectiveFeePercent();
     const platformFee = amount * (feePercent / 100);
     const publisherReceives = amount - platformFee;
@@ -456,43 +468,51 @@ router.post('/intent', async (req, res) => {
 });
 
 /**
- * Verify a Solana transaction
+ * Verify a Solana transaction — checks existence, recency, USDC mint, recipient, and amount
  */
-async function verifySolanaPayment(signature, expectedAmount) {
+async function verifySolanaPayment(signature, expectedAmount, receiverWallet) {
   try {
-    // Get transaction details
     const tx = await connection.getTransaction(signature, {
       commitment: 'confirmed',
       maxSupportedTransactionVersion: 0,
     });
 
-    if (!tx) {
-      return { valid: false, reason: 'Transaction not found' };
-    }
+    if (!tx) return { valid: false, reason: 'Transaction not found' };
+    if (tx.meta?.err) return { valid: false, reason: 'Transaction failed' };
 
-    if (tx.meta?.err) {
-      return { valid: false, reason: 'Transaction failed' };
-    }
-
-    // Recency check: reject transactions older than TX_MAX_AGE_SECONDS
+    // Recency check
     if (tx.blockTime) {
       const txAgeSeconds = Math.floor(Date.now() / 1000) - tx.blockTime;
       if (txAgeSeconds > TX_MAX_AGE_SECONDS) {
         return { valid: false, reason: `Transaction too old (${txAgeSeconds}s ago, max ${TX_MAX_AGE_SECONDS}s)` };
       }
       if (txAgeSeconds < -60) {
-        // Transaction claims to be from the future (clock skew tolerance: 60s)
         return { valid: false, reason: 'Transaction timestamp is in the future' };
       }
     }
 
-    // TODO: verify USDC transfer amount and recipient match expected values
-    return { 
-      valid: true, 
-      amount: expectedAmount,
-      block: tx.slot,
-      blockTime: tx.blockTime,
-    };
+    // Verify USDC was received by the publisher wallet using token balance deltas
+    const preBalances = tx.meta?.preTokenBalances || [];
+    const postBalances = tx.meta?.postTokenBalances || [];
+
+    let receivedAmount = 0;
+    for (const post of postBalances) {
+      if (post.mint !== SOLANA_USDC_MINT) continue;
+      if (post.owner !== receiverWallet) continue;
+      const pre = preBalances.find(b => b.accountIndex === post.accountIndex);
+      const delta = (post.uiTokenAmount?.uiAmount || 0) - (pre?.uiTokenAmount?.uiAmount || 0);
+      if (delta > 0) { receivedAmount = delta; break; }
+    }
+
+    if (receivedAmount === 0) {
+      return { valid: false, reason: 'No USDC transfer to publisher wallet found in transaction' };
+    }
+    // Allow 1% tolerance for rounding
+    if (receivedAmount < expectedAmount * 0.99) {
+      return { valid: false, reason: `Insufficient USDC: received ${receivedAmount}, expected ${expectedAmount}` };
+    }
+
+    return { valid: true, amount: receivedAmount, block: tx.slot, blockTime: tx.blockTime };
 
   } catch (error) {
     console.error('Solana verification error:', error);
@@ -503,7 +523,7 @@ async function verifySolanaPayment(signature, expectedAmount) {
 /**
  * Verify a Base (Ethereum L2) transaction
  */
-async function verifyBasePayment(txHash, expectedAmount) {
+async function verifyBasePayment(txHash, expectedAmount, receiverWallet) {
   try {
     // Fetch transaction receipt from Base RPC
     const response = await fetch(BASE_RPC, {
@@ -551,27 +571,31 @@ async function verifyBasePayment(txHash, expectedAmount) {
       console.error('Block timestamp fetch error (non-fatal):', blockErr.message);
     }
 
-    // Verify it's a USDC transfer to our receiver wallet
-    const usdcTransferTopic = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'; // Transfer event
-    const receiverPadded = BASE_RECEIVER_WALLET?.toLowerCase().replace('0x', '').padStart(64, '0');
+    // Verify it's a USDC Transfer event to the publisher wallet
+    const usdcTransferTopic = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+    const receiverPadded = receiverWallet.toLowerCase().replace('0x', '').padStart(64, '0');
 
-    const transferLog = receipt.logs?.find(log => 
+    const transferLog = receipt.logs?.find(log =>
       log.address?.toLowerCase() === BASE_USDC_ADDRESS.toLowerCase() &&
       log.topics?.[0] === usdcTransferTopic &&
       log.topics?.[2]?.toLowerCase().includes(receiverPadded)
     );
 
     if (!transferLog) {
-      return { valid: false, reason: 'USDC transfer to receiver not found in transaction' };
+      return { valid: false, reason: 'USDC transfer to publisher wallet not found in transaction' };
     }
 
-    // Decode amount from log data (USDC has 6 decimals on Base)
+    // Decode amount (USDC = 6 decimals on Base)
     const amountRaw = BigInt(transferLog.data);
     const amountUsdc = Number(amountRaw) / 1e6;
 
-    // In production: verify amount matches expected
-    return { 
-      valid: true, 
+    // Allow 1% tolerance for rounding
+    if (amountUsdc < expectedAmount * 0.99) {
+      return { valid: false, reason: `Insufficient USDC: received ${amountUsdc}, expected ${expectedAmount}` };
+    }
+
+    return {
+      valid: true,
       amount: amountUsdc,
       block: parseInt(receipt.blockNumber, 16),
       network: 'base',
