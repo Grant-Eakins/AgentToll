@@ -4,13 +4,13 @@
   --bg: #0f1419;
   --bg-raised: #1a1f26;
   --bg-elevated: #242b33;
-  --border: #2f363e;
-  --text: #e6edf3;
-  --text-muted: #8b949e;
-  --text-faint: #6e7681;
-  --accent: #f85149;
-  --accent-hover: #ff6b63;
-  --green: #3fb950;
+  --bg: #dbeeff;
+  --bg-raised: #f7fbff;
+  --bg-elevated: #eaf5ff;
+  --border: #b8d4ea;
+  --text: #142b3d;
+  --text-muted: #4d687a;
+  --text-faint: #6c8290;
   --yellow: #d29922;
   --red: #f85149;
   --purple: #a371f7;
@@ -24,18 +24,12 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-}
-
-html {
-  scroll-behavior: smooth;
-  overflow-x: hidden;
-}
-
+  background: var(--bg);
 body {
   font-family: var(--font);
   background: var(--bg);
   color: var(--text);
-  line-height: 1.6;
+  background: rgba(219, 238, 255, 0.9);
   font-size: clamp(14px, 2vw, 16px);
   position: relative;
   overflow-x: hidden;
